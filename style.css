@@ -1,0 +1,445 @@
+/* ── Reset ── */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Theme tokens ── */
+
+:root {
+  --bg: #1a1a2e;
+  --bg-surface: #16213e;
+  --bg-surface-hover: #1c2a4a;
+  --bg-input: #0f1626;
+  --fg: #e0e0e0;
+  --fg-muted: #8888a0;
+  --fg-dim: #555570;
+  --accent: #7c6fff;
+  --accent-hover: #9580ff;
+  --accent-flash: rgba(124, 111, 255, 0.3);
+  --border: #2a2a4a;
+  --border-focus: #7c6fff;
+  --btn-bg: #252545;
+  --btn-bg-hover: #303060;
+  --btn-fg: #d0d0e0;
+  --btn-disabled: #404060;
+  --status-bg: #12122a;
+  --scrollbar-thumb: #3a3a5a;
+  --scrollbar-track: transparent;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --transition: 150ms ease;
+}
+
+body.light-mode {
+  --bg: #f5f5f0;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f0f0ea;
+  --bg-input: #ffffff;
+  --fg: #1a1a2e;
+  --fg-muted: #666680;
+  --fg-dim: #999;
+  --accent: #5b4fd6;
+  --accent-hover: #4a3fc0;
+  --accent-flash: rgba(91, 79, 214, 0.2);
+  --border: #d8d8e0;
+  --border-focus: #5b4fd6;
+  --btn-bg: #e8e8e4;
+  --btn-bg-hover: #dcdcd8;
+  --btn-fg: #2a2a3e;
+  --btn-disabled: #c0c0c0;
+  --status-bg: #eaeae6;
+  --scrollbar-thumb: #c0c0c8;
+}
+
+/* ── Base ── */
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ── Focus ── */
+
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* ── Header ── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-mascot {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+.header-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.header-tagline {
+  color: var(--fg-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Theme toggle */
+
+.theme-icon-light { display: none; }
+body.light-mode .theme-icon-dark { display: none; }
+body.light-mode .theme-icon-light { display: inline; }
+
+/* ── Buttons ── */
+
+.btn {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--btn-bg-hover);
+  border-color: var(--fg-dim);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  padding: 6px 8px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ── Toolbar ── */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+/* ── Main layout ── */
+
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Editor panel ── */
+
+.editor-panel {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.text-area {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 16px;
+  border: none;
+  background: var(--bg);
+  color: var(--fg);
+  resize: none;
+  outline: none;
+  tab-size: 2;
+  overflow: auto;
+}
+
+.text-area::placeholder {
+  color: var(--fg-dim);
+}
+
+.text-area::selection {
+  background: var(--accent-flash);
+}
+
+/* Scrollbar */
+
+.text-area::-webkit-scrollbar,
+.cleaner-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.text-area::-webkit-scrollbar-track,
+.cleaner-list::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.text-area::-webkit-scrollbar-thumb,
+.cleaner-list::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+/* ── Sidebar ── */
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 12px 14px 0;
+}
+
+.sidebar-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+
+/* ── Filter bar ── */
+
+.filter-bar {
+  padding: 8px 14px;
+}
+
+.filter-input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--fg);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.filter-input::placeholder {
+  color: var(--fg-dim);
+}
+
+.filter-input:focus {
+  border-color: var(--border-focus);
+}
+
+/* ── Cleaner list ── */
+
+.cleaner-list {
+  list-style: none;
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 6px 12px;
+}
+
+.cleaner-item {
+  font-size: 0.85rem;
+  padding: 8px 10px;
+  margin: 1px 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+  user-select: none;
+}
+
+.cleaner-item:hover {
+  background: var(--bg-surface-hover);
+}
+
+.cleaner-item.flash {
+  background: var(--accent-flash);
+  transition: none;
+}
+
+.cleaner-item.hidden {
+  display: none;
+}
+
+/* ── Status bar ── */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  background: var(--status-bg);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.status-counts {
+  display: flex;
+  gap: 16px;
+}
+
+.status-credit a {
+  color: var(--fg-muted);
+}
+
+.status-credit a:hover {
+  color: var(--accent);
+}
+
+/* ── Mobile: bottom sheet ── */
+
+.mobile-cleaners-btn {
+  display: none;
+  position: fixed;
+  bottom: 40px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition);
+}
+
+.mobile-cleaners-btn:hover {
+  transform: scale(1.08);
+}
+
+.mobile-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+}
+
+.mobile-backdrop.active {
+  display: block;
+}
+
+/* ── Responsive: mobile ── */
+
+@media (max-width: 768px) {
+  .header-tagline {
+    display: none;
+  }
+
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 60vh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: 12px 12px 0 0;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 300ms ease, visibility 0s 300ms;
+    visibility: hidden;
+  }
+
+  .sidebar.open {
+    transform: translateY(0);
+    visibility: visible;
+    transition: transform 300ms ease, visibility 0s;
+  }
+
+  .mobile-cleaners-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toolbar {
+    gap: 4px;
+    padding: 6px 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    min-height: 44px;
+  }
+
+  .cleaner-item {
+    padding: 12px 10px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .status-bar {
+    padding: 6px 10px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+}

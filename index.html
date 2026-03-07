@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keen Bear — Clean text. No fuss.</title>
+  <meta name="description" content="A free, dark-mode text cleaning utility. Paste dirty text in, pick a cleaner, get clean text out.">
+  <meta property="og:title" content="Keen Bear">
+  <meta property="og:description" content="Clean text. No fuss.">
+  <meta property="og:image" content="keenbear.png">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-brand">
+      <img src="keenbear.png" alt="Keen Bear mascot" class="header-mascot" width="40" height="40">
+      <h1 class="header-title">Keen Bear</h1>
+      <span class="header-tagline">Clean text. No fuss.</span>
+    </div>
+    <button id="theme-toggle" class="btn btn-icon" title="Toggle light/dark mode" aria-label="Toggle theme">
+      <span class="theme-icon-dark">☀️</span>
+      <span class="theme-icon-light">🌙</span>
+    </button>
+  </header>
+
+  <div class="toolbar">
+    <button id="btn-paste" class="btn" title="Paste from clipboard">Paste</button>
+    <button id="btn-copy" class="btn" title="Copy all text">Copy All</button>
+    <button id="btn-clear" class="btn" title="Clear text">Clear</button>
+    <div class="toolbar-separator"></div>
+    <button id="btn-undo" class="btn" title="Undo (⌘Z)" disabled>Undo</button>
+    <button id="btn-redo" class="btn" title="Redo (⌘⇧Z)" disabled>Redo</button>
+  </div>
+
+  <main class="main">
+    <div class="editor-panel">
+      <textarea id="text-area" class="text-area" placeholder="Paste or type your text here..." spellcheck="false" autofocus></textarea>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">Cleaners</h2>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="filter-input" class="filter-input" placeholder="Filter cleaners… (⌘K)" aria-label="Filter cleaners">
+      </div>
+      <ul id="cleaner-list" class="cleaner-list">
+        <!-- Populated by JS; static placeholders for styling -->
+        <li class="cleaner-item" data-category="whitespace">Remove Extra Spaces</li>
+        <li class="cleaner-item" data-category="whitespace">Remove Extra Returns</li>
+        <li class="cleaner-item" data-category="whitespace">Strip Leading Indentation</li>
+        <li class="cleaner-item" data-category="whitespace">Remove All Tabs</li>
+        <li class="cleaner-item" data-category="whitespace">Trim Whitespace</li>
+        <li class="cleaner-item" data-category="whitespace">Rewrap Text</li>
+        <li class="cleaner-item" data-category="whitespace">Remove Forwarding Characters</li>
+        <li class="cleaner-item" data-category="transform">UPPERCASE</li>
+        <li class="cleaner-item" data-category="transform">lowercase</li>
+        <li class="cleaner-item" data-category="transform">Title Case</li>
+        <li class="cleaner-item" data-category="transform">Sentence Case</li>
+        <li class="cleaner-item" data-category="quotes">Straighten Quotes</li>
+        <li class="cleaner-item" data-category="quotes">Smarten Quotes</li>
+        <li class="cleaner-item" data-category="lines">Sort Lines</li>
+        <li class="cleaner-item" data-category="lines">Remove Duplicate Lines</li>
+        <li class="cleaner-item" data-category="transform">Extract from HTML</li>
+      </ul>
+    </aside>
+  </main>
+
+  <!-- Mobile: floating button to open cleaner drawer -->
+  <button id="btn-mobile-cleaners" class="mobile-cleaners-btn" aria-label="Open cleaners">
+    🧹
+  </button>
+
+  <!-- Mobile: bottom sheet backdrop -->
+  <div id="mobile-backdrop" class="mobile-backdrop"></div>
+
+  <footer class="status-bar">
+    <div class="status-counts">
+      <span id="status-chars">chars: 0</span>
+      <span id="status-words">words: 0</span>
+      <span id="status-lines">lines: 0</span>
+    </div>
+    <div class="status-credit">
+      Built by <a href="https://adamtervort.com" target="_blank" rel="noopener">Adam Tervort</a>
+    </div>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -142,19 +142,19 @@ Build the testable core with zero UI.
 Build the visual layout with no interactivity.
 
 **Tasks:**
-- [ ] Create `index.html` with semantic structure: header (mascot + wordmark + tagline), toolbar, main (text area + sidebar), status bar, footer
-- [ ] Create `style.css` with CSS custom properties for theming (`--bg`, `--fg`, `--accent`, etc.)
-- [ ] Implement dark theme as default (dark background ~#1a1a2e, light text, high contrast)
-- [ ] Implement light theme via `.light-mode` class on `<body>`
-- [ ] Style two-panel layout: text area (left, ~70%) + cleaner sidebar (right, ~30%)
-- [ ] Style toolbar buttons: Paste, Copy All, Clear, Undo, Redo, theme toggle
-- [ ] Style cleaner list items with hover state and click flash
-- [ ] Style status bar (character/word/line counts)
-- [ ] Style filter input above cleaner list
-- [ ] Add responsive breakpoint: below 768px, hide sidebar, add floating button for bottom sheet
-- [ ] Style bottom sheet / drawer for mobile cleaner panel
-- [ ] Monospace font stack: `'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace`
-- [ ] Footer: "Built by Adam Tervort" link
+- [x] Create `index.html` with semantic structure: header (mascot + wordmark + tagline), toolbar, main (text area + sidebar), status bar, footer
+- [x] Create `style.css` with CSS custom properties for theming (`--bg`, `--fg`, `--accent`, etc.)
+- [x] Implement dark theme as default (dark background ~#1a1a2e, light text, high contrast)
+- [x] Implement light theme via `.light-mode` class on `<body>`
+- [x] Style two-panel layout: text area (left, ~70%) + cleaner sidebar (right, ~30%)
+- [x] Style toolbar buttons: Paste, Copy All, Clear, Undo, Redo, theme toggle
+- [x] Style cleaner list items with hover state and click flash
+- [x] Style status bar (character/word/line counts)
+- [x] Style filter input above cleaner list
+- [x] Add responsive breakpoint: below 768px, hide sidebar, add floating button for bottom sheet
+- [x] Style bottom sheet / drawer for mobile cleaner panel
+- [x] Monospace font stack: `'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace`
+- [x] Footer: "Built by Adam Tervort" link
 
 ### Research Insights
 
