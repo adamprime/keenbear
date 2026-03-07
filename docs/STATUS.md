@@ -6,30 +6,34 @@ Keen Bear is a free, dark-mode-first text cleaning utility for the web where use
 
 
 ## Current State
-Project is in pre-implementation planning with a detailed product and UX spec defined.
+Planning complete. Ready for implementation. A fully deepened v1 plan exists at `docs/plans/2026-03-07-feat-keenbear-v1-text-cleaning-app-plan.md`.
 
-**Phase:** Planning / Pre-MVP implementation
+**Phase:** Pre-implementation — start with Phase 1 (TDD + core cleaners)
 **Last Session:** 2026-03-07
-**Last Session Summary:** Initial docs structure created via /init-project-docs
+**Last Session Summary:** Brainstormed v1 feature set, created product spec, wrote full phased implementation plan, deepened plan with architecture/performance/security/UX/testing research insights
 
 ## What's Working
-<!-- Features/systems that are shipped and stable. Keep this current. -->
-
-- Product specification drafted in `keenbear-spec.md`
+- Product specification: `keenbear-spec.md`
+- V1 brainstorm: `docs/brainstorms/2026-03-07-keenbear-v1-brainstorm.md`
+- Deepened implementation plan: `docs/plans/2026-03-07-feat-keenbear-v1-text-cleaning-app-plan.md`
+- Git initialized with remote `git@github.com:adamprime/keenbear.git`
 
 ## What's In Progress
 <!-- Active work items. Update every session. -->
 
 | Item | Status | Branch | Notes |
 |------|--------|--------|-------|
-| Docs foundation | Complete | N/A | Compound engineering structure initialized |
+| Phase 1: Foundation + Core Cleaners | Not started | main | Next up — start with test harness and `history.js` TDD |
 
 ## What's Next
 <!-- Prioritized backlog. Top item = next thing to work on. -->
 
-1. Scaffold initial static app files (`index.html`, `style.css`, `app.js`)
-2. Implement core v1 text cleaners and undo/redo behavior
-3. Add UI shell (toolbar, cleaner list, status bar, theme toggle)
+1. **Phase 1** — Set up `test/test-runner.html`, write failing tests for `history.js` and all core cleaners, implement to green
+2. **Phase 2** — `index.html` + `style.css` shell (dark theme, two-panel layout, responsive)
+3. **Phase 3** — Wire UI to modules (cleaner clicks, toolbar, shortcuts, paste handling)
+4. **Phase 4** — Find & Replace (with regex safety guards)
+5. **Phase 5** — Show Invisibles overlay
+6. **Phase 6** — Polish, nice-to-have cleaners, PWA manifest
 
 ## Open Decisions
 <!-- Architectural or product decisions that haven't been made yet. -->
@@ -38,6 +42,7 @@ Project is in pre-implementation planning with a detailed product and UX spec de
 | Decision | Options Considered | Leaning Toward | Blocking? |
 |----------|--------------------|----------------|-----------|
 | Text editing implementation | `textarea` vs `contenteditable` | `textarea` for v1 simplicity/performance | No |
+| Show Invisibles: overlay vs contenteditable swap | Overlay div (rAF sync) vs swap to contenteditable | Overlay div — more robust native behavior | No — decide in Phase 5 |
 
 ## Known Issues
 <!-- Bugs, tech debt, or things that are broken but not urgent. -->
@@ -62,7 +67,7 @@ Planned architecture is a single-page, client-only app (no server, no accounts, 
 <!-- Brief log of recent sessions. Newest first. Delete entries older than 30 days. -->
 
 ### 2026-03-07
-- **Goal:** Initialize compound engineering docs structure
-- **Accomplished:** Created `docs/` directory with `STATUS.md`, `plans/`, `solutions/`, `decisions/`, `brainstorms/`
-- **Didn't finish:** Fill in all project-specific operational details
-- **Discovered:** Project currently contains specification assets only
+- **Goal:** Plan v1 of Keen Bear text cleaning app
+- **Accomplished:** Product spec finalized; v1 brainstorm completed; full 6-phase implementation plan written; plan deepened with research insights (architecture, performance, security, UX, testing, race conditions, regex safety); git repo initialized and pushed to GitHub
+- **Didn't finish:** No implementation code yet
+- **Discovered:** IME composition handling, clipboard secure-context requirements, and dual-threshold history policy are non-obvious requirements captured in the plan
