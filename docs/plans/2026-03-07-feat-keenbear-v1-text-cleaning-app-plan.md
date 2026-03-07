@@ -111,18 +111,18 @@ keenbear/
 Build the testable core with zero UI.
 
 **Tasks:**
-- [ ] Set up `test/test-runner.html` -- a minimal browser-based test harness (no dependencies; simple assert functions, DOM output)
-- [ ] Write failing tests for `history.js`: push, undo, redo, stack limits (20 levels), canUndo/canRedo
-- [ ] Implement `history.js` to pass tests
-- [ ] Write failing tests for each core cleaner function:
-  - [ ] `removeExtraSpaces(text)` -- collapse 2+ spaces, trim trailing per line
-  - [ ] `removeExtraReturns(text)` -- collapse 3+ newlines to 2
-  - [ ] `stripLeadingIndentation(text)` -- detect smallest common indent, remove from all lines, handle mixed tabs/spaces
-  - [ ] `removeAllTabs(text)` -- replace tabs with N spaces (default 2)
-  - [ ] `trimWhitespace(text)` -- trim leading+trailing whitespace per line
-  - [ ] `rewrapText(text, width)` -- reflow to N chars/line (default 80)
-- [ ] Implement each cleaner to pass tests
-- [ ] Create `cleaners.js` with registry pattern: `export const cleaners = [{ id, name, fn, category }]`
+- [x] Set up `test/test-runner.html` -- a minimal browser-based test harness (no dependencies; simple assert functions, DOM output)
+- [x] Write failing tests for `history.js`: push, undo, redo, stack limits (20 levels), canUndo/canRedo
+- [x] Implement `history.js` to pass tests
+- [x] Write failing tests for each core cleaner function:
+  - [x] `removeExtraSpaces(text)` -- collapse 2+ spaces, trim trailing per line
+  - [x] `removeExtraReturns(text)` -- collapse 3+ newlines to 2
+  - [x] `stripLeadingIndentation(text)` -- detect smallest common indent, remove from all lines, handle mixed tabs/spaces
+  - [x] `removeAllTabs(text)` -- replace tabs with N spaces (default 2)
+  - [x] `trimWhitespace(text)` -- trim leading+trailing whitespace per line
+  - [x] `rewrapText(text, width)` -- reflow to N chars/line (default 80)
+- [x] Implement each cleaner to pass tests
+- [x] Create `cleaners.js` with registry pattern: `export const cleaners = [{ id, name, fn, category }]`
 
 **Tests prove:** Every cleaner produces correct output for normal input, edge cases (empty string, single line, huge input), and mixed whitespace scenarios.
 
