@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Keen Bear — Tests</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, monospace; background: #1a1a2e; color: #e0e0e0; padding: 24px; }
+    h1 { font-size: 1.2rem; margin-bottom: 16px; color: #a0a0ff; }
+    .summary { margin-bottom: 16px; font-size: 0.9rem; }
+    .summary .pass { color: #4ade80; }
+    .summary .fail { color: #f87171; }
+    .suite { margin-bottom: 12px; }
+    .suite-name { font-weight: bold; font-size: 0.95rem; margin-bottom: 4px; color: #c4b5fd; }
+    .test { padding: 2px 0 2px 16px; font-size: 0.85rem; }
+    .test.pass { color: #4ade80; }
+    .test.pass::before { content: '✓ '; }
+    .test.fail { color: #f87171; }
+    .test.fail::before { content: '✗ '; }
+    .error { padding-left: 32px; color: #fca5a5; font-size: 0.8rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Keen Bear Tests</h1>
+  <div id="summary" class="summary"></div>
+  <div id="results"></div>
+
+  <script type="module">
+    const results = [];
+    let currentSuite = null;
+
+    window.describe = function(name, fn) {
+      currentSuite = { name, tests: [] };
+      results.push(currentSuite);
+      fn();
+      currentSuite = null;
+    };
+
+    window.it = function(name, fn) {
+      const test = { name, passed: false, error: null };
+      try {
+        fn();
+        test.passed = true;
+      } catch (e) {
+        test.error = e.message || String(e);
+      }
+      if (currentSuite) {
+        currentSuite.tests.push(test);
+      } else {
+        if (!results.length || results[results.length - 1].name !== '(ungrouped)') {
+          results.push({ name: '(ungrouped)', tests: [] });
+        }
+        results[results.length - 1].tests.push(test);
+      }
+    };
+
+    window.assert = {
+      equal(actual, expected, msg) {
+        if (actual !== expected) {
+          throw new Error(`${msg || 'assert.equal'}\n  expected: ${JSON.stringify(expected)}\n  actual:   ${JSON.stringify(actual)}`);
+        }
+      },
+      deepEqual(actual, expected, msg) {
+        const a = JSON.stringify(actual);
+        const e = JSON.stringify(expected);
+        if (a !== e) {
+          throw new Error(`${msg || 'assert.deepEqual'}\n  expected: ${e}\n  actual:   ${a}`);
+        }
+      },
+      ok(value, msg) {
+        if (!value) throw new Error(msg || `Expected truthy, got ${JSON.stringify(value)}`);
+      },
+      throws(fn, msg) {
+        let threw = false;
+        try { fn(); } catch (e) { threw = true; }
+        if (!threw) throw new Error(msg || 'Expected function to throw');
+      }
+    };
+
+    // Import test modules
+    await import('./history.test.js');
+    await import('./cleaners.test.js');
+
+    // Render results
+    const el = document.getElementById('results');
+    const sumEl = document.getElementById('summary');
+    let total = 0, passed = 0;
+
+    for (const suite of results) {
+      const div = document.createElement('div');
+      div.className = 'suite';
+      div.innerHTML = `<div class="suite-name">${suite.name}</div>`;
+      for (const t of suite.tests) {
+        total++;
+        if (t.passed) passed++;
+        const line = document.createElement('div');
+        line.className = `test ${t.passed ? 'pass' : 'fail'}`;
+        line.textContent = t.name;
+        div.appendChild(line);
+        if (t.error) {
+          const err = document.createElement('div');
+          err.className = 'error';
+          err.textContent = t.error;
+          div.appendChild(err);
+        }
+      }
+      el.appendChild(div);
+    }
+
+    const failed = total - passed;
+    sumEl.innerHTML = `<span class="pass">${passed} passed</span> · <span class="fail">${failed} failed</span> · ${total} total`;
+    document.title = `${failed ? '✗' : '✓'} Keen Bear Tests (${passed}/${total})`;
+  </script>
+</body>
+</html>
