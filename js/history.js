@@ -1,6 +1,6 @@
 export class History {
-  #undoStack = [];
-  #redoStack = [];
+  #states = [];
+  #index = -1;
   #maxDepth;
 
   constructor(maxDepth = 20) {
@@ -8,42 +8,44 @@ export class History {
   }
 
   get canUndo() {
-    return this.#undoStack.length > 0;
+    return this.#index > 0;
   }
 
   get canRedo() {
-    return this.#redoStack.length > 0;
+    return this.#index < this.#states.length - 1;
   }
 
   push(state, source = null) {
-    if (this.#undoStack.length > 0 && this.#undoStack[this.#undoStack.length - 1].text === state) {
+    if (this.#index >= 0 && this.#states[this.#index].text === state) {
       return;
     }
 
-    this.#undoStack.push({ text: state, source });
-    this.#redoStack.length = 0;
+    // Truncate any redo states
+    this.#states.length = this.#index + 1;
+    this.#states.push({ text: state, source });
+    this.#index = this.#states.length - 1;
 
-    if (this.#undoStack.length > this.#maxDepth) {
-      this.#undoStack.shift();
+    // Enforce max depth
+    if (this.#states.length > this.#maxDepth + 1) {
+      this.#states.shift();
+      this.#index--;
     }
   }
 
   undo() {
     if (!this.canUndo) return null;
-    const state = this.#undoStack.pop();
-    this.#redoStack.push(state);
-    return this.#undoStack.length > 0 ? this.#undoStack[this.#undoStack.length - 1].text : null;
+    this.#index--;
+    return this.#states[this.#index].text;
   }
 
   redo() {
     if (!this.canRedo) return null;
-    const state = this.#redoStack.pop();
-    this.#undoStack.push(state);
-    return state.text;
+    this.#index++;
+    return this.#states[this.#index].text;
   }
 
   clear() {
-    this.#undoStack.length = 0;
-    this.#redoStack.length = 0;
+    this.#states.length = 0;
+    this.#index = -1;
   }
 }

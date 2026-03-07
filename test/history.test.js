@@ -7,11 +7,18 @@ describe('History', () => {
     assert.ok(!h.canRedo, 'should not be able to redo');
   });
 
-  it('push adds a state', () => {
+  it('single push: canUndo is false (need 2+ states to undo)', () => {
     const h = new History();
     h.push('hello');
-    assert.ok(h.canUndo, 'should be able to undo after push');
+    assert.ok(!h.canUndo, 'cannot undo with only one state');
     assert.ok(!h.canRedo, 'should not be able to redo after push');
+  });
+
+  it('two pushes: canUndo is true', () => {
+    const h = new History();
+    h.push('first');
+    h.push('second');
+    assert.ok(h.canUndo, 'can undo with two states');
   });
 
   it('undo returns the previous state', () => {
@@ -33,9 +40,10 @@ describe('History', () => {
 
   it('undo at bottom returns null', () => {
     const h = new History();
-    h.push('only');
-    h.undo();
-    const state = h.undo();
+    h.push('first');
+    h.push('second');
+    h.undo(); // returns 'first'
+    const state = h.undo(); // at bottom
     assert.equal(state, null);
   });
 
@@ -57,7 +65,7 @@ describe('History', () => {
     assert.equal(state, 'first');
   });
 
-  it('respects max depth of 20', () => {
+  it('respects max depth of 20 undo levels', () => {
     const h = new History(20);
     for (let i = 0; i < 25; i++) {
       h.push(`state-${i}`);
@@ -72,6 +80,7 @@ describe('History', () => {
 
   it('skips duplicate consecutive states (no-op dedupe)', () => {
     const h = new History();
+    h.push('initial');
     h.push('same');
     h.push('same');
     h.push('same');
@@ -89,28 +98,25 @@ describe('History', () => {
     assert.ok(!h.canRedo);
 
     h.push('a');
-    assert.ok(h.canUndo);
+    assert.ok(!h.canUndo, 'single state: cannot undo');
     assert.ok(!h.canRedo);
 
     h.push('b');
-    assert.ok(h.canUndo);
+    assert.ok(h.canUndo, 'two states: can undo');
     assert.ok(!h.canRedo);
 
     h.undo(); // back to 'a'
-    assert.ok(h.canUndo);
+    assert.ok(!h.canUndo, 'at first state: cannot undo');
     assert.ok(h.canRedo);
 
-    h.undo(); // back to start
-    assert.ok(!h.canUndo);
-    assert.ok(h.canRedo);
-
-    h.redo(); // forward to 'a'
+    h.redo(); // forward to 'b'
     assert.ok(h.canUndo);
-    assert.ok(h.canRedo);
+    assert.ok(!h.canRedo);
   });
 
   it('supports source metadata on push', () => {
     const h = new History();
+    h.push('initial');
     h.push('text', 'cleaner');
     assert.ok(h.canUndo, 'push with source should work');
   });
@@ -122,5 +128,19 @@ describe('History', () => {
     h.clear();
     assert.ok(!h.canUndo);
     assert.ok(!h.canRedo);
+  });
+
+  it('multiple undo and redo cycles', () => {
+    const h = new History();
+    h.push('a');
+    h.push('b');
+    h.push('c');
+
+    assert.equal(h.undo(), 'b');
+    assert.equal(h.undo(), 'a');
+    assert.equal(h.undo(), null); // at bottom
+    assert.equal(h.redo(), 'b');
+    assert.equal(h.redo(), 'c');
+    assert.equal(h.redo(), null); // at top
   });
 });

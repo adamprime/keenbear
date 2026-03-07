@@ -172,22 +172,22 @@ Build the visual layout with no interactivity.
 Connect the modules to the DOM.
 
 **Tasks:**
-- [ ] `ui.js`: Render cleaner list from registry dynamically
-- [ ] Wire cleaner clicks: read textarea value, apply cleaner fn, push to history, update textarea
-- [ ] Wire toolbar buttons:
-  - [ ] Paste -- `navigator.clipboard.readText()`, strip to plain text
-  - [ ] Copy All -- `navigator.clipboard.writeText()`
-  - [ ] Clear -- empty textarea, push to history
-  - [ ] Undo/Redo -- restore from history stack, update textarea
-- [ ] Wire theme toggle -- toggle `.light-mode` on body, persist to `localStorage`
-- [ ] Wire status bar -- update char/word/line counts on input and after cleaner runs
-- [ ] Wire filter bar -- substring match on cleaner names, show/hide list items
-- [ ] Wire keyboard shortcuts:
-  - [ ] Cmd+Z / Cmd+Shift+Z for undo/redo (intercept to use custom history when cleaner was applied)
-  - [ ] Cmd+K or `/` to focus filter
-  - [ ] Escape to clear filter
-- [ ] Ensure pasting rich text strips to plain text (`paste` event handler)
-- [ ] `app.js`: Import all modules, call init
+- [x] `ui.js`: Render cleaner list from registry dynamically
+- [x] Wire cleaner clicks: read textarea value, apply cleaner fn, push to history, update textarea
+- [x] Wire toolbar buttons:
+  - [x] Paste -- `navigator.clipboard.readText()`, strip to plain text
+  - [x] Copy All -- `navigator.clipboard.writeText()`
+  - [x] Clear -- empty textarea, push to history
+  - [x] Undo/Redo -- restore from history stack, update textarea
+- [x] Wire theme toggle -- toggle `.light-mode` on body, persist to `localStorage`
+- [x] Wire status bar -- update char/word/line counts on input and after cleaner runs
+- [x] Wire filter bar -- substring match on cleaner names, show/hide list items
+- [x] Wire keyboard shortcuts:
+  - [x] Cmd+Z / Cmd+Shift+Z for undo/redo (intercept to use custom history when cleaner was applied)
+  - [x] Cmd+K or `/` to focus filter
+  - [x] Escape to clear filter
+- [x] Ensure pasting rich text strips to plain text (`paste` event handler)
+- [x] `app.js`: Import all modules, call init
 
 ### Research Insights
 
