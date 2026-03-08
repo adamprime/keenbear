@@ -31,6 +31,8 @@
     <div class="toolbar-separator"></div>
     <button id="btn-undo" class="btn" title="Undo (⌘Z)" disabled>Undo</button>
     <button id="btn-redo" class="btn" title="Redo (⌘⇧Z)" disabled>Redo</button>
+    <div class="toolbar-separator"></div>
+    <button id="btn-invisibles" class="btn" title="Show invisible characters">¶</button>
   </div>
 
   <div id="find-replace-panel" class="find-replace-panel" hidden>
@@ -52,7 +54,10 @@
 
   <main class="main">
     <div class="editor-panel">
-      <textarea id="text-area" class="text-area" placeholder="Paste or type your text here..." spellcheck="false" autofocus></textarea>
+      <div class="editor-wrapper">
+        <textarea id="text-area" class="text-area" placeholder="Paste or type your text here..." spellcheck="false" autofocus></textarea>
+        <div id="invisibles-overlay" class="invisibles-overlay" aria-hidden="true"></div>
+      </div>
     </div>
 
     <aside class="sidebar" id="sidebar">

@@ -240,14 +240,14 @@ window.addEventListener('keydown', (e) => {
 ### Phase 5: Show Invisibles
 
 **Tasks:**
-- [ ] Implement "show invisibles" toggle in toolbar
-- [ ] When active, render a `<div>` overlay (or switch to a read-only rendered view) that displays:
-  - [ ] `·` for spaces
-  - [ ] `¶` for newlines / paragraph marks
-  - [ ] `→` for tabs
-  - [ ] Visible line break indicators
-- [ ] Text remains editable (either via synced textarea underneath, or contenteditable overlay)
-- [ ] Toggle state persisted to `localStorage`
+- [x] Implement "show invisibles" toggle in toolbar
+- [x] When active, render a `<div>` overlay (or switch to a read-only rendered view) that displays:
+  - [x] `·` for spaces
+  - [x] `¶` for newlines / paragraph marks
+  - [x] `→` for tabs
+  - [x] Visible line break indicators
+- [x] Text remains editable (either via synced textarea underneath, or contenteditable overlay)
+- [x] Toggle state persisted to `localStorage`
 
 ### Research Insights
 

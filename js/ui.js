@@ -23,6 +23,8 @@ const statusLines = document.getElementById('status-lines');
 const sidebar = document.getElementById('sidebar');
 const mobileBtn = document.getElementById('btn-mobile-cleaners');
 const mobileBackdrop = document.getElementById('mobile-backdrop');
+const btnInvisibles = document.getElementById('btn-invisibles');
+const invisiblesOverlay = document.getElementById('invisibles-overlay');
 const findPanel = document.getElementById('find-replace-panel');
 const findInput = document.getElementById('find-input');
 const replaceInput = document.getElementById('replace-input');
@@ -48,6 +50,7 @@ function applyTextChange(run, source = 'cleaner') {
   textarea.value = next;
   updateStatus();
   updateUndoRedoButtons();
+  if (invisiblesActive) renderInvisibles();
 }
 
 // ── Cleaner list rendering ──
@@ -105,6 +108,7 @@ function handleUndo() {
   textarea.value = state ?? '';
   updateStatus();
   updateUndoRedoButtons();
+  if (invisiblesActive) renderInvisibles();
 }
 
 function handleRedo() {
@@ -114,6 +118,7 @@ function handleRedo() {
   textarea.value = state ?? '';
   updateStatus();
   updateUndoRedoButtons();
+  if (invisiblesActive) renderInvisibles();
 }
 
 function updateUndoRedoButtons() {
@@ -249,6 +254,70 @@ function closeMobileSidebar() {
   mobileBackdrop.classList.remove('active');
 }
 
+// ── Show Invisibles ──
+
+let invisiblesActive = false;
+let rafId = null;
+
+function initInvisibles() {
+  const saved = localStorage.getItem('kb-invisibles');
+  if (saved === 'true') {
+    toggleInvisibles(true);
+  }
+}
+
+function toggleInvisibles(force) {
+  invisiblesActive = force !== undefined ? force : !invisiblesActive;
+  document.body.classList.toggle('show-invisibles', invisiblesActive);
+  btnInvisibles.classList.toggle('active', invisiblesActive);
+  localStorage.setItem('kb-invisibles', invisiblesActive);
+  if (invisiblesActive) {
+    renderInvisibles();
+    syncScroll();
+  } else {
+    cancelAnimationFrame(rafId);
+    invisiblesOverlay.textContent = '';
+  }
+}
+
+function renderInvisibles() {
+  const text = textarea.value;
+  const frag = document.createDocumentFragment();
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === ' ') {
+      const span = document.createElement('span');
+      span.className = 'inv-space';
+      span.textContent = '\u00B7'; // middle dot
+      frag.appendChild(span);
+    } else if (ch === '\t') {
+      const span = document.createElement('span');
+      span.className = 'inv-tab';
+      span.textContent = '\u2192\t'; // arrow + tab for spacing
+      frag.appendChild(span);
+    } else if (ch === '\n') {
+      const span = document.createElement('span');
+      span.className = 'inv-newline';
+      span.textContent = '\u00B6'; // pilcrow
+      frag.appendChild(span);
+      frag.appendChild(document.createTextNode('\n'));
+    } else {
+      frag.appendChild(document.createTextNode(ch));
+    }
+  }
+
+  invisiblesOverlay.textContent = '';
+  invisiblesOverlay.appendChild(frag);
+}
+
+function syncScroll() {
+  if (!invisiblesActive) return;
+  invisiblesOverlay.scrollTop = textarea.scrollTop;
+  invisiblesOverlay.scrollLeft = textarea.scrollLeft;
+  rafId = requestAnimationFrame(syncScroll);
+}
+
 // ── Find & Replace ──
 
 function openFindPanel() {
@@ -315,6 +384,7 @@ function setupComposition() {
 export function init() {
   renderCleanerList();
   initTheme();
+  initInvisibles();
   updateStatus();
   updateUndoRedoButtons();
   setupComposition();
@@ -326,12 +396,14 @@ export function init() {
   btnUndo.addEventListener('click', handleUndo);
   btnRedo.addEventListener('click', handleRedo);
   themeToggle.addEventListener('click', toggleTheme);
+  btnInvisibles.addEventListener('click', () => toggleInvisibles());
 
   // Text area
   textarea.addEventListener('input', () => {
     lastActionWasCleaner = false;
     updateStatus();
     if (!findPanel.hidden) updateMatchCount();
+    if (invisiblesActive) renderInvisibles();
   });
   textarea.addEventListener('paste', handlePasteEvent);
 

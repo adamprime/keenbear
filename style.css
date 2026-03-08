@@ -157,6 +157,12 @@ body.light-mode .theme-icon-light { display: inline; }
   cursor: not-allowed;
 }
 
+.btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
 .btn-icon {
   padding: 6px 8px;
   font-size: 1rem;
@@ -198,6 +204,12 @@ body.light-mode .theme-icon-light { display: inline; }
   min-width: 0;
 }
 
+.editor-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+}
+
 .text-area {
   flex: 1;
   font-family: var(--font-mono);
@@ -211,6 +223,44 @@ body.light-mode .theme-icon-light { display: inline; }
   outline: none;
   tab-size: 2;
   overflow: auto;
+}
+
+/* When show-invisibles is active, make textarea text transparent */
+body.show-invisibles .text-area {
+  color: transparent;
+  caret-color: var(--fg);
+}
+
+.invisibles-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 16px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  color: var(--fg);
+  tab-size: 2;
+}
+
+body.show-invisibles .invisibles-overlay {
+  display: block;
+}
+
+.inv-space {
+  color: var(--fg-dim);
+}
+
+.inv-tab {
+  color: var(--fg-dim);
+}
+
+.inv-newline {
+  color: var(--fg-dim);
 }
 
 .text-area::placeholder {
