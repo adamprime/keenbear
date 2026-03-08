@@ -133,36 +133,36 @@ const FLAVORS = {
   hazmat: {
     tagline: 'Decontaminating your clipboard sludge.',
     placeholder: 'Dump your filthy text here...',
-    btnPaste: 'Inject',
-    btnCopy: 'Extract',
-    btnClear: 'Incinerate',
+    titlePaste: 'Inject (Paste)',
+    titleCopy: 'Extract (Copy All)',
+    titleClear: 'Incinerate (Clear)',
     sidebarTitle: 'Protocols',
     filterPlaceholder: 'Filter protocols... (⌘K)'
   },
   artisanal: {
     tagline: 'small-batch, locally sourced regex.',
     placeholder: 'gently rest your unrefined thoughts here...',
-    btnPaste: 'receive',
-    btnCopy: 'preserve',
-    btnClear: 'cleanse palette',
+    titlePaste: 'receive (paste)',
+    titleCopy: 'preserve (copy all)',
+    titleClear: 'cleanse palette (clear)',
     sidebarTitle: 'treatments',
     filterPlaceholder: 'seek treatment... (⌘K)'
   },
   butler: {
     tagline: 'Because frankly, your formatting is an embarrassment.',
     placeholder: 'Please present the text requiring... refinement.',
-    btnPaste: 'Accept',
-    btnCopy: 'Transcribe',
-    btnClear: 'Dispose',
+    titlePaste: 'Accept (Paste)',
+    titleCopy: 'Transcribe (Copy All)',
+    titleClear: 'Dispose (Clear)',
     sidebarTitle: 'Services',
     filterPlaceholder: 'Request service... (⌘K)'
   },
   y2k: {
     tagline: 'EVALUATION COPY - 30 DAYS REMAINING',
     placeholder: 'C:\\> PASTE_TEXT.EXE',
-    btnPaste: 'Paste',
-    btnCopy: 'Copy',
-    btnClear: 'Format C:',
+    titlePaste: 'Paste',
+    titleCopy: 'Copy All',
+    titleClear: 'Format C: (Clear)',
     sidebarTitle: 'Toolbox',
     filterPlaceholder: 'Search... (⌘K)'
   }
@@ -195,9 +195,15 @@ function applyFlavor(flavorId) {
 
   document.getElementById('tagline').textContent = texts.tagline;
   textarea.placeholder = texts.placeholder;
-  btnPaste.textContent = texts.btnPaste;
-  btnCopy.textContent = texts.btnCopy;
-  btnClear.textContent = texts.btnClear;
+  
+  // Standard labels, theme-specific tooltips
+  btnPaste.textContent = 'Paste';
+  btnCopy.textContent = 'Copy All';
+  btnClear.textContent = 'Clear';
+  
+  btnPaste.title = texts.titlePaste;
+  btnCopy.title = texts.titleCopy;
+  btnClear.title = texts.titleClear;
   
   const sidebarTitle = document.querySelector('.sidebar-title');
   if (sidebarTitle) sidebarTitle.textContent = texts.sidebarTitle;
@@ -308,6 +314,7 @@ function handlePasteEvent(e) {
       lastActionWasCleaner = true;
       updateStatus();
       updateUndoRedoButtons();
+      if (invisiblesActive) renderInvisibles();
     }
   }
 }
