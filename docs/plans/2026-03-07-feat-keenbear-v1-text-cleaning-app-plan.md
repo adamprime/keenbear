@@ -263,17 +263,17 @@ window.addEventListener('keydown', (e) => {
 ### Phase 6: Polish + Nice-to-Have Cleaners
 
 **Tasks:**
-- [ ] Add nice-to-have cleaners (tests first for each):
-  - [ ] Remove Forwarding Characters
-  - [ ] UPPERCASE / lowercase / Title Case / Sentence case
-  - [ ] Straighten Quotes / Smarten Quotes
-  - [ ] Sort Lines (ascending/descending)
-  - [ ] Remove Duplicate Lines
-  - [ ] Extract from HTML
-- [ ] Add PWA manifest for "install as app" support
+- [x] Add nice-to-have cleaners (tests first for each):
+  - [x] Remove Forwarding Characters
+  - [x] UPPERCASE / lowercase / Title Case / Sentence case
+  - [x] Straighten Quotes / Smarten Quotes
+  - [x] Sort Lines (ascending/descending)
+  - [x] Remove Duplicate Lines
+  - [x] Extract from HTML
+- [x] Add PWA manifest for "install as app" support
 - [ ] Add favicon (bear mascot head)
-- [ ] Add OG meta tags (title, description, image)
-- [ ] Final responsive polish and cross-browser testing
+- [x] Add OG meta tags (title, description, image)
+- [x] Final responsive polish and cross-browser testing
 
 ### Research Insights
 

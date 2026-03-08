@@ -1,0 +1,17 @@
+{
+  "name": "Keen Bear",
+  "short_name": "Keen Bear",
+  "description": "Clean text. No fuss. A free text cleaning utility.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "keenbear.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
