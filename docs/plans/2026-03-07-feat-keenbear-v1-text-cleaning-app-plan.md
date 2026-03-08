@@ -216,11 +216,11 @@ window.addEventListener('keydown', (e) => {
 ### Phase 4: Find & Replace
 
 **Tasks:**
-- [ ] Write tests for find & replace logic: literal match, regex match, case-sensitive toggle, match count, replace all
-- [ ] Implement find/replace as a cleaner with UI panel (inline above or below text area)
-- [ ] Real-time match count display
-- [ ] Replace All applies as one undo step
-- [ ] Cmd+F opens the panel, Escape closes it
+- [x] Write tests for find & replace logic: literal match, regex match, case-sensitive toggle, match count, replace all
+- [x] Implement find/replace as a cleaner with UI panel (inline above or below text area)
+- [x] Real-time match count display
+- [x] Replace All applies as one undo step
+- [x] Cmd+F opens the panel, Escape closes it
 
 ### Research Insights
 

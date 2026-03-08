@@ -1,5 +1,6 @@
 import { cleaners } from './cleaners.js';
 import { History } from './history.js';
+import { countMatches, replaceAll as findReplaceAll } from './find-replace.js';
 
 const history = new History(20);
 let lastActionWasCleaner = false;
@@ -22,6 +23,15 @@ const statusLines = document.getElementById('status-lines');
 const sidebar = document.getElementById('sidebar');
 const mobileBtn = document.getElementById('btn-mobile-cleaners');
 const mobileBackdrop = document.getElementById('mobile-backdrop');
+const findPanel = document.getElementById('find-replace-panel');
+const findInput = document.getElementById('find-input');
+const replaceInput = document.getElementById('replace-input');
+const findRegex = document.getElementById('find-regex');
+const findCase = document.getElementById('find-case');
+const findMatchCount = document.getElementById('find-match-count');
+const btnReplaceAll = document.getElementById('btn-replace-all');
+const btnFindClose = document.getElementById('btn-find-close');
+const findError = document.getElementById('find-error');
 
 // ── Central mutation ──
 
@@ -164,8 +174,19 @@ function handleKeydown(e) {
     return;
   }
 
-  // Escape → clear filter / close mobile sidebar
+  // Cmd+F → open find panel
+  if (meta && e.key === 'f') {
+    e.preventDefault();
+    openFindPanel();
+    return;
+  }
+
+  // Escape → close find panel / clear filter / close mobile sidebar
   if (e.key === 'Escape') {
+    if (!findPanel.hidden) {
+      closeFindPanel();
+      return;
+    }
     if (sidebar.classList.contains('open')) {
       closeMobileSidebar();
     } else if (document.activeElement === filterInput) {
@@ -228,6 +249,60 @@ function closeMobileSidebar() {
   mobileBackdrop.classList.remove('active');
 }
 
+// ── Find & Replace ──
+
+function openFindPanel() {
+  findPanel.hidden = false;
+  findInput.focus();
+  findInput.select();
+  updateMatchCount();
+}
+
+function closeFindPanel() {
+  findPanel.hidden = true;
+  findError.hidden = true;
+  textarea.focus();
+}
+
+function getFindOptions() {
+  return {
+    regex: findRegex.checked,
+    caseSensitive: findCase.checked,
+  };
+}
+
+function updateMatchCount() {
+  const pattern = findInput.value;
+  if (!pattern) {
+    findMatchCount.textContent = '0 matches';
+    findError.hidden = true;
+    return;
+  }
+  try {
+    const count = countMatches(textarea.value, pattern, getFindOptions());
+    findMatchCount.textContent = `${count} match${count !== 1 ? 'es' : ''}`;
+    findError.hidden = true;
+  } catch (e) {
+    findMatchCount.textContent = '0 matches';
+    findError.textContent = e.message;
+    findError.hidden = false;
+  }
+}
+
+function handleReplaceAll() {
+  const pattern = findInput.value;
+  if (!pattern) return;
+  try {
+    const replacement = replaceInput.value;
+    const options = getFindOptions();
+    applyTextChange(text => findReplaceAll(text, pattern, replacement, options), 'replace-all');
+    updateMatchCount();
+  } catch (e) {
+    findError.textContent = e.message;
+    findError.hidden = false;
+  }
+}
+
 // ── IME composition ──
 
 function setupComposition() {
@@ -256,6 +331,7 @@ export function init() {
   textarea.addEventListener('input', () => {
     lastActionWasCleaner = false;
     updateStatus();
+    if (!findPanel.hidden) updateMatchCount();
   });
   textarea.addEventListener('paste', handlePasteEvent);
 
@@ -264,6 +340,13 @@ export function init() {
 
   // Keyboard shortcuts
   window.addEventListener('keydown', handleKeydown);
+
+  // Find & Replace
+  findInput.addEventListener('input', updateMatchCount);
+  findRegex.addEventListener('change', updateMatchCount);
+  findCase.addEventListener('change', updateMatchCount);
+  btnReplaceAll.addEventListener('click', handleReplaceAll);
+  btnFindClose.addEventListener('click', closeFindPanel);
 
   // Mobile sidebar
   mobileBtn.addEventListener('click', openMobileSidebar);

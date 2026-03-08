@@ -66,6 +66,7 @@ console.log('\nKeen Bear Tests\n');
 
 await import('./history.test.js');
 await import('./cleaners.test.js');
+await import('./find-replace.test.js');
 
 console.log(`\n${passed} passed · ${failed} failed · ${total} total\n`);
 process.exit(failed > 0 ? 1 : 0);

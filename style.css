@@ -349,6 +349,90 @@ body.light-mode .theme-icon-light { display: inline; }
   color: var(--accent);
 }
 
+/* ── Find & Replace panel ── */
+
+.find-replace-panel {
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.find-replace-panel[hidden] {
+  display: none;
+}
+
+.find-replace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.find-replace-label {
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+  width: 55px;
+  flex-shrink: 0;
+}
+
+.find-replace-input {
+  flex: 1;
+  max-width: 300px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--fg);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.find-replace-input:focus {
+  border-color: var(--border-focus);
+}
+
+.find-replace-toggle {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.find-replace-toggle input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.find-match-count {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+}
+
+.find-error {
+  font-size: 0.75rem;
+  color: #f87171;
+  padding: 0 0 2px 55px;
+}
+
+.find-error[hidden] {
+  display: none;
+}
+
 /* ── Mobile: bottom sheet ── */
 
 .mobile-cleaners-btn {
