@@ -19,12 +19,20 @@
     <div class="header-brand">
       <img src="keenbear.png" alt="Keen Bear mascot" class="header-mascot" width="40" height="40">
       <h1 class="header-title">Keen Bear</h1>
-      <span class="header-tagline">Clean text. No fuss.</span>
+      <span class="header-tagline" id="tagline">Clean text. No fuss.</span>
     </div>
-    <button id="theme-toggle" class="btn btn-icon" title="Toggle light/dark mode" aria-label="Toggle theme">
-      <span class="theme-icon-dark">☀️</span>
-      <span class="theme-icon-light">🌙</span>
-    </button>
+    <div class="header-controls">
+      <select id="flavor-select" class="flavor-select" aria-label="Theme Flavor">
+        <option value="hazmat">Hazmat</option>
+        <option value="artisanal">Artisanal</option>
+        <option value="butler">Butler</option>
+        <option value="y2k">Y2K</option>
+      </select>
+      <button id="theme-toggle" class="btn btn-icon" title="Toggle light/dark mode" aria-label="Toggle theme">
+        <span class="theme-icon-dark">☀️</span>
+        <span class="theme-icon-light">🌙</span>
+      </button>
+    </div>
   </header>
 
   <div class="toolbar">

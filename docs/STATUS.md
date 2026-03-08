@@ -77,6 +77,10 @@ Planned architecture is a single-page, client-only app (no server, no accounts, 
 ## Session Log
 <!-- Brief log of recent sessions. Newest first. Delete entries older than 30 days. -->
 
+### 2026-03-07 (session 3)
+- **Goal:** UI/UX overhaul and flavor system
+- **Accomplished:** Added a dynamic "flavor" system with 4 distinct visual and copy themes: Hazmat (brutalist/industrial), Artisanal (minimalist/pretentious), Butler (formal/passive-aggressive), and Y2K (nostalgic shareware). Flavor choice is persisted to localStorage and updates both CSS variables and DOM text content instantly.
+
 ### 2026-03-07 (session 2)
 - **Goal:** Implement all 6 phases of v1
 - **Accomplished:** All phases complete — TDD foundation (99 tests), HTML/CSS shell with dark/light themes, full UI wiring (cleaners, toolbar, shortcuts, filter), Find & Replace with regex safety, Show Invisibles overlay, PWA manifest + service worker

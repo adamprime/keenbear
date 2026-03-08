@@ -17,6 +17,7 @@ const btnClear = document.getElementById('btn-clear');
 const btnUndo = document.getElementById('btn-undo');
 const btnRedo = document.getElementById('btn-redo');
 const themeToggle = document.getElementById('theme-toggle');
+const flavorSelect = document.getElementById('flavor-select');
 const statusChars = document.getElementById('status-chars');
 const statusWords = document.getElementById('status-words');
 const statusLines = document.getElementById('status-lines');
@@ -126,13 +127,82 @@ function updateUndoRedoButtons() {
   btnRedo.disabled = !history.canRedo;
 }
 
-// ── Theme ──
+// ── Theme & Flavor ──
+
+const FLAVORS = {
+  hazmat: {
+    tagline: 'Decontaminating your clipboard sludge.',
+    placeholder: 'Dump your filthy text here...',
+    btnPaste: 'Inject',
+    btnCopy: 'Extract',
+    btnClear: 'Incinerate',
+    sidebarTitle: 'Protocols',
+    filterPlaceholder: 'Filter protocols... (⌘K)'
+  },
+  artisanal: {
+    tagline: 'small-batch, locally sourced regex.',
+    placeholder: 'gently rest your unrefined thoughts here...',
+    btnPaste: 'receive',
+    btnCopy: 'preserve',
+    btnClear: 'cleanse palette',
+    sidebarTitle: 'treatments',
+    filterPlaceholder: 'seek treatment... (⌘K)'
+  },
+  butler: {
+    tagline: 'Because frankly, your formatting is an embarrassment.',
+    placeholder: 'Please present the text requiring... refinement.',
+    btnPaste: 'Accept',
+    btnCopy: 'Transcribe',
+    btnClear: 'Dispose',
+    sidebarTitle: 'Services',
+    filterPlaceholder: 'Request service... (⌘K)'
+  },
+  y2k: {
+    tagline: 'EVALUATION COPY - 30 DAYS REMAINING',
+    placeholder: 'C:\\> PASTE_TEXT.EXE',
+    btnPaste: 'Paste',
+    btnCopy: 'Copy',
+    btnClear: 'Format C:',
+    sidebarTitle: 'Toolbox',
+    filterPlaceholder: 'Search... (⌘K)'
+  }
+};
 
 function initTheme() {
-  const saved = localStorage.getItem('kb-theme');
-  if (saved === 'light') {
+  const savedTheme = localStorage.getItem('kb-theme');
+  if (savedTheme === 'light') {
     document.body.classList.add('light-mode');
   }
+
+  const savedFlavor = localStorage.getItem('kb-flavor') || 'hazmat';
+  flavorSelect.value = savedFlavor;
+  applyFlavor(savedFlavor);
+
+  flavorSelect.addEventListener('change', (e) => {
+    applyFlavor(e.target.value);
+  });
+}
+
+function applyFlavor(flavorId) {
+  // Remove existing flavor classes
+  document.body.classList.remove('flavor-hazmat', 'flavor-artisanal', 'flavor-butler', 'flavor-y2k');
+  document.body.classList.add(`flavor-${flavorId}`);
+  localStorage.setItem('kb-flavor', flavorId);
+
+  // Update verbiage
+  const texts = FLAVORS[flavorId];
+  if (!texts) return;
+
+  document.getElementById('tagline').textContent = texts.tagline;
+  textarea.placeholder = texts.placeholder;
+  btnPaste.textContent = texts.btnPaste;
+  btnCopy.textContent = texts.btnCopy;
+  btnClear.textContent = texts.btnClear;
+  
+  const sidebarTitle = document.querySelector('.sidebar-title');
+  if (sidebarTitle) sidebarTitle.textContent = texts.sidebarTitle;
+  
+  filterInput.placeholder = texts.filterPlaceholder;
 }
 
 function toggleTheme() {
