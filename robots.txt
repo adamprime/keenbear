@@ -1,0 +1,46 @@
+# Keen Bear — keenbear.com
+# AI search crawlers: allowed (so we appear in AI-generated answers)
+# AI training crawlers: blocked (our content, our choice)
+
+User-agent: *
+Allow: /
+
+# AI search crawlers (appear in AI search results)
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+# AI training crawlers (blocked)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+Sitemap: https://keenbear.com/sitemap.xml

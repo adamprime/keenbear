@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keenbear-v1';
+const CACHE_NAME = 'keenbear-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -9,7 +9,11 @@ const ASSETS = [
   '/js/history.js',
   '/js/find-replace.js',
   '/keenbear.png',
+  '/og-image.png',
   '/manifest.json',
+  '/robots.txt',
+  '/llms.txt',
+  '/sitemap.xml',
 ];
 
 self.addEventListener('install', (e) => {

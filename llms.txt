@@ -1,0 +1,20 @@
+# Keen Bear
+
+> A free, dark-mode text cleaning utility. Paste dirty text in, pick a cleaner, get clean text out. No sign-up, no server, works offline.
+
+Keen Bear is a client-only web app for cleaning and transforming plain text. It runs entirely in the browser with zero external dependencies, no accounts, and no data sent to any server.
+
+## Features
+
+- 16 one-click text cleaners: remove extra spaces, extra returns, strip indentation, trim whitespace, case transforms, quote straightening/smartening, sort lines, deduplicate, extract from HTML, rewrap text, and more
+- Find & Replace with regex support and match highlighting
+- Show Invisibles overlay (spaces, tabs, newlines)
+- 20-level undo/redo history
+- Dark and light themes with 4 visual flavors (Hazmat, Artisanal, Butler, Y2K)
+- PWA: installable, works offline
+- Keyboard shortcuts for all common actions
+
+## Links
+
+- App: https://keenbear.com/
+- Author: https://adamtervort.com
