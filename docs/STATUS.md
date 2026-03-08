@@ -1,16 +1,16 @@
 # Project Status
-<!-- Updated: 2026-03-07 by Adam -->
+<!-- Updated: 2026-03-08 -->
 
 ## Project Overview
 Keen Bear is a free, dark-mode-first text cleaning utility for the web where users paste plain text, run one-click cleaners, and get cleaned output locally in the browser with no account required.
 
 
 ## Current State
-All 6 phases complete. V1 is feature-complete and ready for deployment.
+All 6 phases complete. GEO readiness pass done. Ready for Netlify deploy.
 
-**Phase:** V1 complete — ready for Netlify deploy
-**Last Session:** 2026-03-07
-**Last Session Summary:** Implemented all 6 phases: TDD foundation, HTML/CSS shell, UI wiring, Find & Replace, Show Invisibles, and polish (PWA, service worker).
+**Phase:** V1 complete + GEO optimized — ready for Netlify deploy
+**Last Session:** 2026-03-08
+**Last Session Summary:** GEO readiness audit and implementation — added structured data (WebApplication + FAQPage JSON-LD), collapsible FAQ section, robots.txt, llms.txt, sitemap.xml, netlify.toml, OG/Twitter Card tags, and canonical URL.
 
 ## What's Working
 - Product specification: `keenbear-spec.md`
@@ -25,6 +25,8 @@ All 6 phases complete. V1 is feature-complete and ready for deployment.
 - **`js/app.js`:** Entry point with service worker registration
 - **`index.html` + `style.css`:** Two-panel layout, dark/light themes, responsive mobile bottom sheet
 - **PWA:** manifest.json + service worker for offline/installable support
+- **GEO/SEO:** JSON-LD (WebApplication + FAQPage), robots.txt, llms.txt, sitemap.xml, netlify.toml, OG + Twitter Card meta, canonical URL
+- **FAQ:** 8-item collapsible "About & FAQ" section below the fold with flavor-aware styling
 
 ## What's In Progress
 <!-- Active work items. Update every session. -->
@@ -37,14 +39,14 @@ All 6 phases complete. V1 is feature-complete and ready for deployment.
 | Phase 4: Find & Replace | Complete | feat/phase-1-foundation-core-cleaners | Regex + safety guards |
 | Phase 5: Show Invisibles | Complete | feat/phase-1-foundation-core-cleaners | Overlay approach |
 | Phase 6: Polish + PWA | Complete | feat/phase-1-foundation-core-cleaners | Manifest + service worker |
+| GEO Readiness | Complete | main | Structured data, FAQ, crawler access, OG tags |
 
 ## What's Next
 <!-- Prioritized backlog. Top item = next thing to work on. -->
 
-1. **Deploy to Netlify** — static site, connect to keenbear.com
+1. **Deploy to Netlify** — static site, connect to keenbear.com (netlify.toml ready)
 2. **Generate proper favicon** — extract bear head from mascot image for 32x32 / 16x16
-3. **OG image** — create 1200x630 branded image for social sharing
-4. **My Scrub** — chained cleaner feature (v2)
+3. **My Scrub** — chained cleaner feature (v2)
 
 ## Open Decisions
 <!-- Architectural or product decisions that haven't been made yet. -->
@@ -76,6 +78,12 @@ Planned architecture is a single-page, client-only app (no server, no accounts, 
 
 ## Session Log
 <!-- Brief log of recent sessions. Newest first. Delete entries older than 30 days. -->
+
+### 2026-03-08 (session 4)
+- **Goal:** GEO readiness audit and implementation
+- **Accomplished:** Ran full 6-dimension GEO audit (scored 24/100 pre-work). Implemented all 7 priority actions: fixed OG tags with absolute URLs + Twitter Cards, added JSON-LD structured data (WebApplication + FAQPage), created robots.txt with AI search/training crawler rules, llms.txt, sitemap.xml, netlify.toml with security headers, canonical URL, meta author. Built collapsible 8-item FAQ section with flavor-aware styling. OG image created (og-image.png). Service worker bumped to v3.
+- **Didn't finish:** Netlify deploy, favicon extraction
+- **Discovered:** GEO audit methodology — FAQPage schema + on-page FAQ content is the highest-impact GEO signal for utility apps
 
 ### 2026-03-07 (session 3)
 - **Goal:** UI/UX overhaul and flavor system
