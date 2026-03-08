@@ -81,9 +81,9 @@ Planned architecture is a single-page, client-only app (no server, no accounts, 
 
 ### 2026-03-08 (session 4)
 - **Goal:** GEO readiness audit and implementation
-- **Accomplished:** Ran full 6-dimension GEO audit (scored 24/100 pre-work). Implemented all 7 priority actions: fixed OG tags with absolute URLs + Twitter Cards, added JSON-LD structured data (WebApplication + FAQPage), created robots.txt with AI search/training crawler rules, llms.txt, sitemap.xml, netlify.toml with security headers, canonical URL, meta author. Built collapsible 8-item FAQ section with flavor-aware styling. OG image created (og-image.png). Service worker bumped to v3.
+- **Accomplished:** Ran full 6-dimension GEO audit (scored 24/100 pre-work). Implemented all 7 priority actions: fixed OG tags with absolute URLs + Twitter Cards, added JSON-LD structured data (WebApplication + FAQPage), created robots.txt with AI search/training crawler rules, llms.txt, sitemap.xml, netlify.toml with security headers, canonical URL, meta author. Built collapsible 8-item FAQ section below the fold with full flavor-aware styling — each flavor (Hazmat, Artisanal, Butler, Y2K) has appropriate heading styles, text colors, and `kbd`/`code` element treatments matching the existing UI conventions. OG image created (og-image.png). Service worker bumped to v3.
 - **Didn't finish:** Netlify deploy, favicon extraction
-- **Discovered:** GEO audit methodology — FAQPage schema + on-page FAQ content is the highest-impact GEO signal for utility apps
+- **Discovered:** GEO audit methodology — FAQPage schema + on-page FAQ content is the highest-impact GEO signal for utility apps. Native `<details>/<summary>` works well for collapsible sections without adding JS.
 
 ### 2026-03-07 (session 3)
 - **Goal:** UI/UX overhaul and flavor system
