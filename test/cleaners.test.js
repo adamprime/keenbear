@@ -15,6 +15,15 @@ import {
   sortLines,
   removeDuplicateLines,
   extractFromHTML,
+  unwrapParagraphs,
+  cleanCodePaste,
+  stripEmojis,
+  removeNonASCII,
+  normalizeUnicode,
+  stripEmails,
+  stripURLs,
+  removeBlankLines,
+  fixPunctuationSpacing,
 } from '../js/cleaners.js';
 
 // ── removeExtraSpaces ──
@@ -341,5 +350,216 @@ describe('extractFromHTML', () => {
 
   it('handles nested tags', () => {
     assert.equal(extractFromHTML('<div><p>hello <strong>world</strong></p></div>'), 'hello world');
+  });
+});
+
+// ── unwrapParagraphs ──
+
+describe('unwrapParagraphs', () => {
+  it('joins single newlines into spaces', () => {
+    assert.equal(unwrapParagraphs('hello\nworld'), 'hello world');
+  });
+
+  it('preserves paragraph breaks (double newlines)', () => {
+    assert.equal(unwrapParagraphs('para one\nline two\n\npara two\nline two'), 'para one line two\n\npara two line two');
+  });
+
+  it('handles Windows-style line endings', () => {
+    assert.equal(unwrapParagraphs('hello\r\nworld'), 'hello world');
+  });
+
+  it('handles triple+ newlines as paragraph breaks', () => {
+    assert.equal(unwrapParagraphs('a\n\n\nb'), 'a\n\nb');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(unwrapParagraphs(''), '');
+  });
+
+  it('handles single line (no change)', () => {
+    assert.equal(unwrapParagraphs('hello world'), 'hello world');
+  });
+});
+
+// ── cleanCodePaste ──
+
+describe('cleanCodePaste', () => {
+  it('strips leading indent and unwraps hard-wrapped text', () => {
+    const input = '    This is a line that\n    was hard wrapped\n    by an editor.';
+    assert.equal(cleanCodePaste(input), 'This is a line that was hard wrapped by an editor.');
+  });
+
+  it('preserves paragraph breaks', () => {
+    const input = '    Para one\n    continues.\n\n    Para two\n    here.';
+    assert.equal(cleanCodePaste(input), 'Para one continues.\n\nPara two here.');
+  });
+
+  it('collapses extra spaces after unwrap', () => {
+    const input = '  hello   world\n  foo   bar';
+    assert.equal(cleanCodePaste(input), 'hello world foo bar');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(cleanCodePaste(''), '');
+  });
+});
+
+// ── stripEmojis ──
+
+describe('stripEmojis', () => {
+  it('removes emoji characters', () => {
+    assert.equal(stripEmojis('hello 😀 world 🎉'), 'hello  world ');
+  });
+
+  it('removes multi-codepoint emojis', () => {
+    assert.equal(stripEmojis('test 👨‍👩‍👧‍👦 end'), 'test  end');
+  });
+
+  it('handles text with no emojis', () => {
+    assert.equal(stripEmojis('hello world'), 'hello world');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(stripEmojis(''), '');
+  });
+});
+
+// ── removeNonASCII ──
+
+describe('removeNonASCII', () => {
+  it('removes non-ASCII characters', () => {
+    assert.equal(removeNonASCII('hello café'), 'hello caf');
+  });
+
+  it('preserves standard ASCII including newlines and tabs', () => {
+    assert.equal(removeNonASCII('hello\tworld\n'), 'hello\tworld\n');
+  });
+
+  it('removes unicode symbols', () => {
+    assert.equal(removeNonASCII('price: €50'), 'price: 50');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(removeNonASCII(''), '');
+  });
+});
+
+// ── normalizeUnicode ──
+
+describe('normalizeUnicode', () => {
+  it('converts smart quotes to straight', () => {
+    assert.equal(normalizeUnicode('\u201Chello\u201D'), '"hello"');
+  });
+
+  it('converts em/en dashes to hyphens', () => {
+    assert.equal(normalizeUnicode('a\u2014b\u2013c'), 'a--b-c');
+  });
+
+  it('converts fancy spaces to regular spaces', () => {
+    assert.equal(normalizeUnicode('hello\u00A0world\u2003end'), 'hello world end');
+  });
+
+  it('converts ellipsis to three dots', () => {
+    assert.equal(normalizeUnicode('wait\u2026'), 'wait...');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(normalizeUnicode(''), '');
+  });
+});
+
+// ── stripEmails ──
+
+describe('stripEmails', () => {
+  it('removes email addresses', () => {
+    assert.equal(stripEmails('contact me at user@example.com thanks'), 'contact me at  thanks');
+  });
+
+  it('removes multiple emails', () => {
+    assert.equal(stripEmails('a@b.com and c@d.org'), ' and ');
+  });
+
+  it('handles text with no emails', () => {
+    assert.equal(stripEmails('hello world'), 'hello world');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(stripEmails(''), '');
+  });
+});
+
+// ── stripURLs ──
+
+describe('stripURLs', () => {
+  it('removes http URLs', () => {
+    assert.equal(stripURLs('visit http://example.com today'), 'visit  today');
+  });
+
+  it('removes https URLs', () => {
+    assert.equal(stripURLs('see https://example.com/path?q=1 here'), 'see  here');
+  });
+
+  it('removes www URLs', () => {
+    assert.equal(stripURLs('go to www.example.com now'), 'go to  now');
+  });
+
+  it('handles text with no URLs', () => {
+    assert.equal(stripURLs('hello world'), 'hello world');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(stripURLs(''), '');
+  });
+});
+
+// ── removeBlankLines ──
+
+describe('removeBlankLines', () => {
+  it('removes empty lines', () => {
+    assert.equal(removeBlankLines('a\n\nb\n\nc'), 'a\nb\nc');
+  });
+
+  it('removes whitespace-only lines', () => {
+    assert.equal(removeBlankLines('a\n   \nb\n\t\nc'), 'a\nb\nc');
+  });
+
+  it('handles no blank lines', () => {
+    assert.equal(removeBlankLines('a\nb\nc'), 'a\nb\nc');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(removeBlankLines(''), '');
+  });
+});
+
+// ── fixPunctuationSpacing ──
+
+describe('fixPunctuationSpacing', () => {
+  it('adds space after period if missing', () => {
+    assert.equal(fixPunctuationSpacing('Hello.World'), 'Hello. World');
+  });
+
+  it('adds space after comma if missing', () => {
+    assert.equal(fixPunctuationSpacing('a,b,c'), 'a, b, c');
+  });
+
+  it('does not double existing spaces', () => {
+    assert.equal(fixPunctuationSpacing('Hello. World'), 'Hello. World');
+  });
+
+  it('adds space after exclamation and question marks', () => {
+    assert.equal(fixPunctuationSpacing('What?Really!Yes'), 'What? Really! Yes');
+  });
+
+  it('does not add space after punctuation at end of line', () => {
+    assert.equal(fixPunctuationSpacing('Hello.\nWorld.'), 'Hello.\nWorld.');
+  });
+
+  it('does not add space inside numbers like 1.5 or 3,000', () => {
+    assert.equal(fixPunctuationSpacing('price is 1.5 or 3,000'), 'price is 1.5 or 3,000');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(fixPunctuationSpacing(''), '');
   });
 });

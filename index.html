@@ -41,7 +41,7 @@
     },
     "image": "https://keenbear.com/keenbear.png",
     "datePublished": "2026-03-07",
-    "dateModified": "2026-03-08"
+    "dateModified": "2026-03-17"
   }
   </script>
   <script type="application/ld+json">
@@ -78,7 +78,7 @@
         "name": "What text cleaners are available?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Keen Bear includes 16 one-click cleaners organized by category. Whitespace cleaners handle extra spaces, extra returns, leading indentation, tabs, and line trimming. Text transform cleaners cover uppercase, lowercase, title case, and sentence case. Punctuation cleaners straighten or smarten curly quotes. Structural cleaners sort lines, remove duplicates, rewrap text to a line width, strip email forwarding characters, remove line numbers, and extract plain text from HTML."
+          "text": "Keen Bear includes 25 one-click cleaners organized by category. Whitespace cleaners handle extra spaces, extra returns, leading indentation, tabs, line trimming, unwrapping paragraphs, cleaning code pastes, and removing blank lines. Character cleaners strip emojis, remove non-ASCII characters, and normalize unicode. Text transforms cover uppercase, lowercase, title case, sentence case, and HTML extraction. Privacy cleaners strip emails and URLs. Quote cleaners straighten or smarten curly quotes. Line operations sort and deduplicate. Writing tools fix punctuation spacing. Plus Find & Replace with regex support."
         }
       },
       {
@@ -197,44 +197,263 @@
   <!-- Mobile: bottom sheet backdrop -->
   <div id="mobile-backdrop" class="mobile-backdrop"></div>
 
-  <section class="faq-section">
-    <details class="faq-collapse">
-      <summary class="faq-toggle"><h2 class="faq-heading">About &amp; FAQ</h2></summary>
-      <div class="faq-content">
-        <div class="faq-item">
-          <h3>What is Keen Bear?</h3>
-          <p>Keen Bear is a free text cleaning utility that runs entirely in your browser. Paste in messy text — whether it's copied from email, a PDF, a website, or a code editor — pick a cleaner from the sidebar, and get clean output instantly. It's designed for writers, developers, editors, and anyone who works with plain text and needs to tidy it up quickly without installing software or creating an account.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Is Keen Bear free?</h3>
-          <p>Yes, completely free with no catch. There are no ads, no premium tiers, no usage limits, and no account required. Keen Bear is a public utility — part of a collection of small, useful web tools built by Adam Tervort. You can use it as much as you want, whenever you want, at no cost.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Is my text private? Does anything get sent to a server?</h3>
-          <p>Your text never leaves your browser. Keen Bear has zero server-side code — no API calls, no analytics that capture your content, no data transmission of any kind. All cleaning operations run locally in JavaScript on your device. Your text stays on your machine from the moment you paste it to the moment you close the tab. This makes Keen Bear safe for sensitive or confidential content.</p>
-        </div>
-        <div class="faq-item">
-          <h3>What text cleaners are available?</h3>
-          <p>Keen Bear includes 16 one-click cleaners organized by category. Whitespace cleaners handle extra spaces, extra returns, leading indentation, tabs, and line trimming. Text transform cleaners cover uppercase, lowercase, title case, and sentence case. Punctuation cleaners straighten or smarten curly quotes. Structural cleaners sort lines, remove duplicates, rewrap text to a line width, strip email forwarding characters, remove line numbers, and extract plain text from HTML.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Does Keen Bear work offline?</h3>
-          <p>Yes. Keen Bear is a Progressive Web App (PWA) with a service worker that caches all assets on first visit. After that initial load, it works fully offline — no internet connection needed. You can also install it as a standalone app on your desktop or phone through your browser's "Install" or "Add to Home Screen" option, giving you a dedicated window without browser chrome.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Can I use Find &amp; Replace with regular expressions?</h3>
-          <p>Yes. Open Find &amp; Replace with <kbd>Cmd+F</kbd> (or <kbd>Ctrl+F</kbd> on Windows/Linux), then check the "Regex" toggle. Keen Bear supports full JavaScript regular expression syntax including capture groups — you can use patterns like <code>$1</code> in the replacement field to reference matched groups. Match count updates in real time as you type, and regex patterns are capped at 500 characters to prevent performance issues.</p>
-        </div>
-        <div class="faq-item">
-          <h3>What keyboard shortcuts does Keen Bear support?</h3>
-          <p>Keen Bear supports standard editing shortcuts: <kbd>Cmd+Z</kbd> for undo, <kbd>Cmd+Shift+Z</kbd> for redo, <kbd>Cmd+A</kbd> to select all, and <kbd>Cmd+C</kbd> to copy. For Keen Bear-specific features: <kbd>Cmd+F</kbd> opens Find &amp; Replace, <kbd>Cmd+K</kbd> or <kbd>/</kbd> focuses the cleaner filter, and <kbd>Escape</kbd> closes panels and clears filters. The undo history tracks up to 20 levels, so you can freely experiment with cleaners and step back.</p>
-        </div>
-        <div class="faq-item">
-          <h3>Who built Keen Bear?</h3>
-          <p>Keen Bear was built by <a href="https://adamtervort.com" target="_blank" rel="noopener">Adam Tervort</a>, a developer who makes small, useful web tools. It's part of a collection that includes TL;DResume, Breathe Easy, and ComicCaster. Keen Bear was inspired by TextSoap and similar desktop text utilities, reimagined as a modern, free, browser-based tool with a dark-mode-first design and zero dependencies.</p>
-        </div>
+  <section class="about-section">
+    <div class="about-content">
+
+      <h2 class="about-heading">About Keen Bear</h2>
+      <p>Keen Bear is a free, open text cleaning and formatting utility that runs entirely in your browser. Paste in messy text — copied from email, a PDF, a website, a code editor, or an AI assistant — pick a cleaner from the sidebar, and get clean output instantly. No sign-up, no server, no data leaves your machine.</p>
+      <p>It's built for writers, developers, editors, and anyone who regularly wrangles plain text. Whether you need to strip indentation from a code paste, unwrap hard-wrapped paragraphs, normalize unicode characters, or redact email addresses before sharing a document, Keen Bear handles it in one click. Your text stays private — all operations run locally in JavaScript with zero network requests.</p>
+      <p>Keen Bear is a Progressive Web App. After your first visit, it works fully offline and can be installed as a standalone app on your desktop or phone. It's part of a collection of small, useful web tools built by <a href="https://adamtervort.com" target="_blank" rel="noopener">Adam Tervort</a>.</p>
+
+      <h2 class="about-heading">Cleaner Reference</h2>
+      <p>Keen Bear includes 25 one-click cleaners organized by category. Click any cleaner in the sidebar to apply it to your entire text. Each application is one undo step.</p>
+
+      <h3 class="ref-category">Whitespace</h3>
+
+      <div class="ref-item">
+        <h4>Remove Extra Spaces</h4>
+        <p>Collapses runs of multiple spaces to a single space and trims trailing spaces from each line.</p>
+        <pre class="ref-example"><code>Before:  Hello    world   
+After:   Hello world</code></pre>
       </div>
-    </details>
+
+      <div class="ref-item">
+        <h4>Remove Extra Returns</h4>
+        <p>Collapses runs of three or more blank lines down to a single paragraph break. Preserves intentional double-newline paragraph separators.</p>
+        <pre class="ref-example"><code>Before:  Line one↵↵↵↵↵Line two
+After:   Line one↵↵Line two</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Strip Leading Indentation</h4>
+        <p>Detects the smallest common indent across all non-empty lines and removes it. Useful for pasted code snippets that carry extra indentation.</p>
+        <pre class="ref-example"><code>Before:      function hello() {
+                 return 'hi';
+             }
+After:   function hello() {
+             return 'hi';
+         }</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Remove All Tabs</h4>
+        <p>Replaces every tab character with spaces (2 by default).</p>
+        <pre class="ref-example"><code>Before:  →hello→world
+After:    hello  world</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Trim Whitespace</h4>
+        <p>Removes leading and trailing whitespace from every line.</p>
+        <pre class="ref-example"><code>Before:    hello world   
+After:   hello world</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Rewrap Text</h4>
+        <p>Reflows text to fit within 80 characters per line (configurable). Preserves paragraph breaks.</p>
+        <pre class="ref-example"><code>Before:  This is a very long line that goes on and on and exceeds eighty characters in total width.
+After:   This is a very long line that goes on and on and exceeds eighty characters
+         in total width.</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Remove Forwarding Characters</h4>
+        <p>Strips the leading <code>&gt;</code> and <code>&gt; </code> from each line — the quoting characters added by email forwarding.</p>
+        <pre class="ref-example"><code>Before:  > > Original message text
+After:   > Original message text</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Unwrap Paragraphs</h4>
+        <p>Joins lines within a paragraph into flowing text (replaces single newlines with spaces) while preserving double-newline paragraph breaks. Perfect for cleaning text copied from AI assistants, terminals, or hard-wrapped editors.</p>
+        <pre class="ref-example"><code>Before:  This is a line that
+         was hard wrapped
+         by an editor.
+After:   This is a line that was hard wrapped by an editor.</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Clean Code Paste</h4>
+        <p>One-click combo: strips leading indentation, unwraps hard-wrapped paragraphs, and collapses extra spaces. Designed for cleaning text copied from code editors and AI coding assistants.</p>
+        <pre class="ref-example"><code>Before:      This is indented text
+             that was also hard
+             wrapped by a tool.
+After:   This is indented text that was also hard wrapped by a tool.</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Remove Blank Lines</h4>
+        <p>Removes all empty and whitespace-only lines. More aggressive than Remove Extra Returns — eliminates all gaps, not just excess ones.</p>
+        <pre class="ref-example"><code>Before:  Line one
+         
+         Line two
+         
+         Line three
+After:   Line one
+         Line two
+         Line three</code></pre>
+      </div>
+
+      <h3 class="ref-category">Text Transforms</h3>
+
+      <div class="ref-item">
+        <h4>UPPERCASE</h4>
+        <p>Converts all text to uppercase letters.</p>
+        <pre class="ref-example"><code>Before:  Hello World
+After:   HELLO WORLD</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>lowercase</h4>
+        <p>Converts all text to lowercase letters.</p>
+        <pre class="ref-example"><code>Before:  Hello World
+After:   hello world</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Title Case</h4>
+        <p>Capitalizes the first letter of each word, with smart handling of articles and prepositions (a, an, the, and, but, or, etc.) which stay lowercase mid-sentence.</p>
+        <pre class="ref-example"><code>Before:  the quick brown fox and the lazy dog
+After:   The Quick Brown Fox and the Lazy Dog</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Sentence Case</h4>
+        <p>Capitalizes the first letter after sentence-ending punctuation. Everything else becomes lowercase.</p>
+        <pre class="ref-example"><code>Before:  hello world. goodbye WORLD.
+After:   Hello world. Goodbye world.</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Extract from HTML</h4>
+        <p>Strips all HTML tags and decodes HTML entities, leaving only the text content.</p>
+        <pre class="ref-example"><code>Before:  &lt;p&gt;Hello &lt;strong&gt;world&lt;/strong&gt;&lt;/p&gt;
+After:   Hello world</code></pre>
+      </div>
+
+      <h3 class="ref-category">Quotes</h3>
+
+      <div class="ref-item">
+        <h4>Straighten Quotes</h4>
+        <p>Converts smart/curly quotes (&ldquo; &rdquo; &lsquo; &rsquo;) to plain straight quotes (" ').</p>
+        <pre class="ref-example"><code>Before:  &ldquo;Hello&rdquo; and &lsquo;world&rsquo;
+After:   "Hello" and 'world'</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Smarten Quotes</h4>
+        <p>Converts straight quotes to typographically correct smart/curly quotes.</p>
+        <pre class="ref-example"><code>Before:  "Hello" and 'world'
+After:   &ldquo;Hello&rdquo; and &lsquo;world&rsquo;</code></pre>
+      </div>
+
+      <h3 class="ref-category">Characters</h3>
+
+      <div class="ref-item">
+        <h4>Strip Emojis</h4>
+        <p>Removes all emoji characters, including multi-codepoint sequences like family emojis.</p>
+        <pre class="ref-example"><code>Before:  Great job 🎉 Keep going 💪
+After:   Great job  Keep going </code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Remove Non-ASCII</h4>
+        <p>Strips all characters outside the standard ASCII range (codes 0-127). Removes accented letters, emoji, currency symbols, and other unicode characters.</p>
+        <pre class="ref-example"><code>Before:  café €50 naïve
+After:   caf 50 nave</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Normalize Unicode</h4>
+        <p>Converts common unicode characters to their ASCII equivalents: smart quotes to straight, em/en dashes to hyphens, ellipsis to three dots, non-breaking spaces to regular spaces.</p>
+        <pre class="ref-example"><code>Before:  &ldquo;Hello&rdquo; &mdash; wait&hellip;
+After:   "Hello" -- wait...</code></pre>
+      </div>
+
+      <h3 class="ref-category">Privacy</h3>
+
+      <div class="ref-item">
+        <h4>Strip Emails</h4>
+        <p>Removes email addresses from the text. Useful for redacting contact information before sharing.</p>
+        <pre class="ref-example"><code>Before:  Contact me at user@example.com thanks
+After:   Contact me at  thanks</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Strip URLs</h4>
+        <p>Removes web URLs (http, https, and www) from the text.</p>
+        <pre class="ref-example"><code>Before:  Visit https://example.com for details
+After:   Visit  for details</code></pre>
+      </div>
+
+      <h3 class="ref-category">Lines</h3>
+
+      <div class="ref-item">
+        <h4>Sort Lines</h4>
+        <p>Sorts all lines alphabetically. Supports ascending and descending order.</p>
+        <pre class="ref-example"><code>Before:  banana
+         apple
+         cherry
+After:   apple
+         banana
+         cherry</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Remove Duplicate Lines</h4>
+        <p>Removes duplicate lines, preserving the first occurrence of each.</p>
+        <pre class="ref-example"><code>Before:  apple
+         banana
+         apple
+         cherry
+After:   apple
+         banana
+         cherry</code></pre>
+      </div>
+
+      <h3 class="ref-category">Writing</h3>
+
+      <div class="ref-item">
+        <h4>Fix Punctuation Spacing</h4>
+        <p>Ensures a single space follows periods, commas, exclamation marks, question marks, semicolons, and colons. Does not affect numbers (e.g. 3.14 and 1,000 are left alone).</p>
+        <pre class="ref-example"><code>Before:  Hello.World,this is great!Right?
+After:   Hello. World, this is great! Right?</code></pre>
+      </div>
+
+      <h2 class="about-heading">Frequently Asked Questions</h2>
+
+      <div class="faq-item">
+        <h3>Is Keen Bear free?</h3>
+        <p>Yes, completely free with no catch. There are no ads, no premium tiers, no usage limits, and no account required. Keen Bear is a public utility — part of a collection of small, useful web tools built by Adam Tervort. You can use it as much as you want, whenever you want, at no cost.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Is my text private? Does anything get sent to a server?</h3>
+        <p>Your text never leaves your browser. Keen Bear has zero server-side code — no API calls, no analytics that capture your content, no data transmission of any kind. All cleaning operations run locally in JavaScript on your device. Your text stays on your machine from the moment you paste it to the moment you close the tab. This makes Keen Bear safe for sensitive or confidential content.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Does Keen Bear work offline?</h3>
+        <p>Yes. Keen Bear is a Progressive Web App (PWA) with a service worker that caches all assets on first visit. After that initial load, it works fully offline — no internet connection needed. You can also install it as a standalone app on your desktop or phone through your browser's "Install" or "Add to Home Screen" option, giving you a dedicated window without browser chrome.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Can I use Find &amp; Replace with regular expressions?</h3>
+        <p>Yes. Open Find &amp; Replace with <kbd>Cmd+F</kbd> (or <kbd>Ctrl+F</kbd> on Windows/Linux), then check the "Regex" toggle. Keen Bear supports full JavaScript regular expression syntax including capture groups — you can use patterns like <code>$1</code> in the replacement field to reference matched groups. Match count updates in real time as you type, and regex patterns are capped at 500 characters to prevent performance issues.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What keyboard shortcuts does Keen Bear support?</h3>
+        <p>Keen Bear supports standard editing shortcuts: <kbd>Cmd+Z</kbd> for undo, <kbd>Cmd+Shift+Z</kbd> for redo, <kbd>Cmd+A</kbd> to select all, and <kbd>Cmd+C</kbd> to copy. For Keen Bear-specific features: <kbd>Cmd+F</kbd> opens Find &amp; Replace, <kbd>Cmd+K</kbd> or <kbd>/</kbd> focuses the cleaner filter, and <kbd>Escape</kbd> closes panels and clears filters. The undo history tracks up to 20 levels, so you can freely experiment with cleaners and step back.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Who built Keen Bear?</h3>
+        <p>Keen Bear was built by <a href="https://adamtervort.com" target="_blank" rel="noopener">Adam Tervort</a>, a developer who makes small, useful web tools. It's part of a collection that includes TL;DResume, Breathe Easy, and ComicCaster. Keen Bear was inspired by TextSoap and similar desktop text utilities, reimagined as a modern, free, browser-based tool with a dark-mode-first design and zero dependencies.</p>
+      </div>
+
+    </div>
   </section>
 
   <footer class="status-bar">

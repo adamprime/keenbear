@@ -441,6 +441,7 @@ body.flavor-y2k .btn.active {
   outline: none;
   tab-size: 2;
   overflow: auto;
+  max-width: 80ch;
 }
 
 body.flavor-y2k .editor-wrapper {
@@ -760,55 +761,113 @@ body.flavor-y2k .find-match-count { color: #000; }
   display: none;
 }
 
-/* ── FAQ section ── */
+/* ── About / Reference / FAQ section ── */
 
-.faq-section {
+.about-section {
   flex-shrink: 0;
   border-top: var(--border-width) solid var(--border);
   background: var(--bg-surface);
 }
 
-.faq-collapse {
+.about-content {
   max-width: 720px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 32px 24px 24px;
 }
 
-.faq-toggle {
-  padding: 14px 0;
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
-}
-
-.faq-toggle::-webkit-details-marker { display: none; }
-.faq-toggle::marker { display: none; content: ''; }
-
-.faq-heading {
+.about-heading {
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--fg-muted);
-  display: inline;
+  margin-bottom: 16px;
+  margin-top: 32px;
 }
 
-.faq-heading::after {
-  content: ' +';
-  font-weight: 400;
+.about-heading:first-child {
+  margin-top: 0;
 }
 
-details.faq-collapse[open] .faq-heading::after {
-  content: ' −';
+body.flavor-artisanal .about-heading { text-transform: lowercase; font-weight: normal; }
+body.flavor-butler .about-heading { font-style: italic; text-transform: none; font-weight: normal; font-size: 1rem; }
+body.flavor-y2k .about-heading { font-weight: bold; color: #000; text-transform: none; }
+
+.about-content > p {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--fg-muted);
+  margin-bottom: 12px;
 }
 
-body.flavor-artisanal .faq-heading { text-transform: lowercase; font-weight: normal; }
-body.flavor-butler .faq-heading { font-style: italic; text-transform: none; font-weight: normal; font-size: 1rem; }
-body.flavor-y2k .faq-heading { font-weight: bold; color: #000; text-transform: none; }
+body.flavor-y2k .about-content > p { color: #000; }
 
-.faq-content {
-  padding-bottom: 24px;
+.about-content > p a {
+  color: var(--accent);
 }
+
+/* Cleaner Reference */
+
+.ref-category {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-top: 24px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+body.flavor-artisanal .ref-category { text-transform: lowercase; font-weight: 400; }
+body.flavor-butler .ref-category { font-style: italic; text-transform: none; font-weight: normal; }
+body.flavor-y2k .ref-category { color: navy; }
+
+.ref-item {
+  margin-bottom: 20px;
+}
+
+.ref-item h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+
+body.flavor-hazmat .ref-item h4 { text-transform: uppercase; color: var(--accent); }
+body.flavor-artisanal .ref-item h4 { font-weight: 400; }
+body.flavor-butler .ref-item h4 { font-style: italic; font-weight: normal; }
+body.flavor-y2k .ref-item h4 { color: #000; }
+
+.ref-item p {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--fg-muted);
+  margin-bottom: 8px;
+}
+
+body.flavor-y2k .ref-item p { color: #000; }
+
+.ref-example {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  overflow-x: auto;
+  color: var(--fg-muted);
+}
+
+body.flavor-y2k .ref-example {
+  background: #fff;
+  color: #000;
+  border: 2px inset #fff;
+}
+
+/* FAQ items */
 
 .faq-item {
   margin-bottom: 20px;

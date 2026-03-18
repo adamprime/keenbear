@@ -146,6 +146,82 @@ export function extractFromHTML(text) {
   return textarea.value;
 }
 
+// ── Paragraph / Paste Cleaners ──
+
+export function unwrapParagraphs(text) {
+  if (!text) return '';
+  const normalized = text.replace(/\r\n/g, '\n');
+  // Split on paragraph breaks (2+ newlines), unwrap single newlines within each
+  return normalized
+    .replace(/\n{3,}/g, '\n\n')
+    .split(/\n\n/)
+    .map(para => para.replace(/\n/g, ' '))
+    .join('\n\n');
+}
+
+export function cleanCodePaste(text) {
+  if (!text) return '';
+  let result = stripLeadingIndentation(text);
+  result = unwrapParagraphs(result);
+  result = removeExtraSpaces(result);
+  return result;
+}
+
+// ── Character Cleaners ──
+
+export function stripEmojis(text) {
+  if (!text) return '';
+  return text.replace(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Component}(?!\d)/gu, '')
+    .replace(/\u200D/g, '');
+}
+
+export function removeNonASCII(text) {
+  if (!text) return '';
+  return text.replace(/[^\x00-\x7F]/g, '');
+}
+
+export function normalizeUnicode(text) {
+  if (!text) return '';
+  return text
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/\u2014/g, '--')
+    .replace(/\u2013/g, '-')
+    .replace(/\u2026/g, '...')
+    .replace(/[\u00A0\u2000-\u200A\u2003\u202F\u205F\u3000]/g, ' ')
+    .replace(/[\uFB01]/g, 'fi')
+    .replace(/[\uFB02]/g, 'fl');
+}
+
+// ── Privacy / Redaction Cleaners ──
+
+export function stripEmails(text) {
+  if (!text) return '';
+  return text.replace(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, '');
+}
+
+export function stripURLs(text) {
+  if (!text) return '';
+  return text.replace(/https?:\/\/[^\s]+/g, '')
+    .replace(/www\.[^\s]+/g, '');
+}
+
+// ── Line Cleaners ──
+
+export function removeBlankLines(text) {
+  if (!text) return '';
+  return text.split('\n').filter(line => line.trim().length > 0).join('\n');
+}
+
+// ── Writing Cleaners ──
+
+export function fixPunctuationSpacing(text) {
+  if (!text) return '';
+  // Add space after punctuation when followed by a non-space, non-newline, non-digit character
+  // But not when the punctuation is between digits (e.g. 1.5, 3,000)
+  return text.replace(/([.!?,;:])([^\s\d\n])/g, '$1 $2');
+}
+
 // ── Registry ──
 
 export const cleaners = [
@@ -165,4 +241,13 @@ export const cleaners = [
   { id: 'sort-lines', name: 'Sort Lines', fn: sortLines, category: 'lines' },
   { id: 'remove-duplicate-lines', name: 'Remove Duplicate Lines', fn: removeDuplicateLines, category: 'lines' },
   { id: 'extract-from-html', name: 'Extract from HTML', fn: extractFromHTML, category: 'transform' },
+  { id: 'unwrap-paragraphs', name: 'Unwrap Paragraphs', fn: unwrapParagraphs, category: 'whitespace' },
+  { id: 'clean-code-paste', name: 'Clean Code Paste', fn: cleanCodePaste, category: 'whitespace' },
+  { id: 'strip-emojis', name: 'Strip Emojis', fn: stripEmojis, category: 'characters' },
+  { id: 'remove-non-ascii', name: 'Remove Non-ASCII', fn: removeNonASCII, category: 'characters' },
+  { id: 'normalize-unicode', name: 'Normalize Unicode', fn: normalizeUnicode, category: 'characters' },
+  { id: 'strip-emails', name: 'Strip Emails', fn: stripEmails, category: 'privacy' },
+  { id: 'strip-urls', name: 'Strip URLs', fn: stripURLs, category: 'privacy' },
+  { id: 'remove-blank-lines', name: 'Remove Blank Lines', fn: removeBlankLines, category: 'lines' },
+  { id: 'fix-punctuation-spacing', name: 'Fix Punctuation Spacing', fn: fixPunctuationSpacing, category: 'writing' },
 ];

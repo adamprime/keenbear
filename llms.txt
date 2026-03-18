@@ -6,7 +6,7 @@ Keen Bear is a client-only web app for cleaning and transforming plain text. It 
 
 ## Features
 
-- 16 one-click text cleaners: remove extra spaces, extra returns, strip indentation, trim whitespace, case transforms, quote straightening/smartening, sort lines, deduplicate, extract from HTML, rewrap text, and more
+- 25 one-click text cleaners: whitespace (extra spaces, extra returns, indentation, tabs, trim, rewrap, unwrap paragraphs, clean code paste, blank lines), transforms (uppercase, lowercase, title case, sentence case, HTML extraction), characters (strip emojis, remove non-ASCII, normalize unicode), privacy (strip emails, strip URLs), quotes (straighten, smarten), lines (sort, deduplicate), writing (fix punctuation spacing)
 - Find & Replace with regex support and match highlighting
 - Show Invisibles overlay (spaces, tabs, newlines)
 - 20-level undo/redo history
