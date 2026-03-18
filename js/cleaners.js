@@ -162,6 +162,7 @@ export function unwrapParagraphs(text) {
 export function cleanCodePaste(text) {
   if (!text) return '';
   let result = stripLeadingIndentation(text);
+  result = trimWhitespace(result);
   result = unwrapParagraphs(result);
   result = removeExtraSpaces(result);
   return result;

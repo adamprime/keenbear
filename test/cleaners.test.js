@@ -399,6 +399,11 @@ describe('cleanCodePaste', () => {
     assert.equal(cleanCodePaste(input), 'hello world foo bar');
   });
 
+  it('trims leading spaces from each line before unwrapping', () => {
+    const input = '  hello\n  world';
+    assert.equal(cleanCodePaste(input), 'hello world');
+  });
+
   it('handles empty string', () => {
     assert.equal(cleanCodePaste(''), '');
   });
