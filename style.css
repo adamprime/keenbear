@@ -217,6 +217,7 @@ body.flavor-y2k.light-mode {
 
 html, body {
   height: 100%;
+  margin: 0;
 }
 
 body {
@@ -225,7 +226,8 @@ body {
   color: var(--fg);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   transition: background var(--transition), color var(--transition);
 }
 
@@ -410,8 +412,9 @@ body.flavor-y2k .btn.active {
 
 .main {
   display: flex;
-  flex: 1;
-  min-height: 0;
+  height: calc(100vh - 105px);
+  min-height: 400px;
+  flex-shrink: 0;
 }
 
 /* ── Editor panel ── */
