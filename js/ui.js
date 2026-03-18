@@ -56,20 +56,34 @@ function applyTextChange(run, source = 'cleaner') {
 
 // ── Cleaner list rendering ──
 
+const isMac = navigator.platform?.toUpperCase().includes('MAC') || navigator.userAgent?.includes('Mac');
+const modKey = isMac ? '⌥' : 'Alt+';
+
 function renderCleanerList() {
   cleanerList.innerHTML = '';
-  for (const cleaner of cleaners) {
+  cleaners.forEach((cleaner, i) => {
     const li = document.createElement('li');
     li.className = 'cleaner-item';
     li.dataset.id = cleaner.id;
     li.dataset.category = cleaner.category;
-    li.textContent = cleaner.name;
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = cleaner.name;
+    li.appendChild(nameSpan);
+
+    if (i < 9) {
+      const kbd = document.createElement('kbd');
+      kbd.className = 'cleaner-shortcut';
+      kbd.textContent = `${modKey}${i + 1}`;
+      li.appendChild(kbd);
+    }
+
     li.addEventListener('click', () => {
       applyTextChange(text => cleaner.fn(text), cleaner.id);
       flashItem(li);
     });
     cleanerList.appendChild(li);
-  }
+  });
 }
 
 function flashItem(el) {
@@ -183,13 +197,22 @@ function initTheme() {
     document.body.classList.add('light-mode');
   }
 
-  const savedFlavor = localStorage.getItem('kb-flavor') || 'hazmat';
+  const savedFlavor = localStorage.getItem('kb-flavor') || 'pirate';
   flavorSelect.value = savedFlavor;
   applyFlavor(savedFlavor);
 
   flavorSelect.addEventListener('change', (e) => {
     applyFlavor(e.target.value);
   });
+}
+
+function setButtonLabel(btn, label) {
+  const textNode = Array.from(btn.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+  if (textNode) {
+    textNode.textContent = label + ' ';
+  } else {
+    btn.insertBefore(document.createTextNode(label + ' '), btn.firstChild);
+  }
 }
 
 function applyFlavor(flavorId) {
@@ -205,10 +228,10 @@ function applyFlavor(flavorId) {
   document.getElementById('tagline').textContent = texts.tagline;
   textarea.placeholder = texts.placeholder;
   
-  // Standard labels, theme-specific tooltips
-  btnPaste.textContent = 'Paste';
-  btnCopy.textContent = 'Copy All';
-  btnClear.textContent = 'Clear';
+  // Standard labels, theme-specific tooltips (preserve kbd children)
+  setButtonLabel(btnPaste, 'Paste');
+  setButtonLabel(btnCopy, 'Copy All');
+  setButtonLabel(btnClear, 'Clear');
   
   btnPaste.title = texts.titlePaste;
   btnCopy.title = texts.titleCopy;
@@ -283,6 +306,26 @@ function handleKeydown(e) {
       filterInput.value = '';
       handleFilter();
       textarea.focus();
+    }
+    return;
+  }
+
+  // Alt/Option+0 → toggle show invisibles
+  if (e.altKey && e.key === '0') {
+    e.preventDefault();
+    toggleInvisibles();
+    return;
+  }
+
+  // Alt/Option+1-9 → run cleaner by position
+  if (e.altKey && e.key >= '1' && e.key <= '9') {
+    e.preventDefault();
+    const index = parseInt(e.key) - 1;
+    if (index < cleaners.length) {
+      const cleaner = cleaners[index];
+      applyTextChange(text => cleaner.fn(text), cleaner.id);
+      const items = cleanerList.querySelectorAll('.cleaner-item');
+      if (items[index]) flashItem(items[index]);
     }
     return;
   }
@@ -467,10 +510,17 @@ function setupComposition() {
 
 // ── Init ──
 
+function initShortcutBadges() {
+  document.querySelectorAll('.btn-shortcut').forEach(kbd => {
+    kbd.textContent = isMac ? kbd.dataset.mac : kbd.dataset.other;
+  });
+}
+
 export function init() {
   renderCleanerList();
   initTheme();
   initInvisibles();
+  initShortcutBadges();
   updateStatus();
   updateUndoRedoButtons();
   setupComposition();

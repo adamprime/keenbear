@@ -393,12 +393,29 @@ body.light-mode .theme-icon-light { display: inline; }
   font-weight: 500;
   padding: 6px 12px;
   border: var(--border-width) solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   border-radius: var(--radius-sm);
   background: var(--btn-bg);
   color: var(--btn-fg);
   cursor: pointer;
   transition: background var(--transition), border-color var(--transition), transform var(--transition);
   white-space: nowrap;
+}
+
+.btn-shortcut {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-style: normal;
+  font-weight: normal;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--fg-muted);
+  opacity: 0.7;
+  line-height: 1.5;
 }
 
 /* Flavor-specific button styles */
@@ -471,7 +488,7 @@ body.flavor-y2k .btn.active {
 
 .main {
   display: flex;
-  height: calc(100vh - 105px);
+  height: calc(100vh - 130px);
   min-height: 400px;
   flex-shrink: 0;
 }
@@ -677,6 +694,23 @@ body.flavor-y2k .filter-input {
   cursor: pointer;
   transition: background var(--transition);
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cleaner-shortcut {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-style: normal;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--fg-muted);
+  flex-shrink: 0;
+  line-height: 1.4;
 }
 
 body.flavor-hazmat .cleaner-item { font-family: var(--font-display); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); margin: 0; }
@@ -711,6 +745,11 @@ body.flavor-pirate .cleaner-item:hover { background: var(--accent); color: var(-
   background: var(--status-bg);
   border-top: var(--border-width) solid var(--border);
   flex-shrink: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 
 body.flavor-hazmat .status-bar { font-family: var(--font-display); text-transform: uppercase; }
@@ -838,7 +877,7 @@ body.flavor-y2k .find-match-count { color: #000; }
 .about-content {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 24px 24px;
+  padding: 32px 24px 48px;
 }
 
 .about-heading {

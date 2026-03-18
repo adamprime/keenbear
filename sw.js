@@ -1,4 +1,4 @@
-const CACHE_NAME = 'keenbear-v4';
+const CACHE_NAME = 'keenbear-v5';
 const ASSETS = [
   '/',
   '/index.html',
