@@ -533,6 +533,7 @@ export function init() {
   btnRedo.addEventListener('click', handleRedo);
   themeToggle.addEventListener('click', toggleTheme);
   btnInvisibles.addEventListener('click', () => toggleInvisibles());
+  document.getElementById('btn-find')?.addEventListener('click', openFindPanel);
 
   // Text area
   textarea.addEventListener('input', () => {
