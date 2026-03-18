@@ -482,6 +482,7 @@ body.flavor-y2k.show-invisibles .text-area {
   overflow: hidden;
   color: var(--fg);
   tab-size: 2;
+  max-width: 80ch;
 }
 body.flavor-y2k .invisibles-overlay { color: #000; }
 
