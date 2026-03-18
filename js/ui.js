@@ -311,16 +311,16 @@ function handleKeydown(e) {
   }
 
   // Alt/Option+0 → toggle show invisibles
-  if (e.altKey && e.key === '0') {
+  if (e.altKey && e.code === 'Digit0') {
     e.preventDefault();
     toggleInvisibles();
     return;
   }
 
   // Alt/Option+1-9 → run cleaner by position
-  if (e.altKey && e.key >= '1' && e.key <= '9') {
+  if (e.altKey && e.code >= 'Digit1' && e.code <= 'Digit9') {
     e.preventDefault();
-    const index = parseInt(e.key) - 1;
+    const index = parseInt(e.code.slice(-1)) - 1;
     if (index < cleaners.length) {
       const cleaner = cleaners[index];
       applyTextChange(text => cleaner.fn(text), cleaner.id);
