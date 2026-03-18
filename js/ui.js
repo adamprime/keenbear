@@ -165,6 +165,15 @@ const FLAVORS = {
     titleClear: 'Format C: (Clear)',
     sidebarTitle: 'Toolbox',
     filterPlaceholder: 'Search... (⌘K)'
+  },
+  pirate: {
+    tagline: 'Arr! Swab yer clipboard, ye filthy landlubber.',
+    placeholder: 'Dump yer plunder here, Captain...',
+    titlePaste: 'Haul Aboard (Paste)',
+    titleCopy: 'Plunder (Copy All)',
+    titleClear: 'Scuttle (Clear)',
+    sidebarTitle: 'Yer Arsenal',
+    filterPlaceholder: 'Search the hold... (⌘K)'
   }
 };
 
@@ -185,7 +194,7 @@ function initTheme() {
 
 function applyFlavor(flavorId) {
   // Remove existing flavor classes
-  document.body.classList.remove('flavor-hazmat', 'flavor-artisanal', 'flavor-butler', 'flavor-y2k');
+  document.body.classList.remove('flavor-hazmat', 'flavor-artisanal', 'flavor-butler', 'flavor-y2k', 'flavor-pirate');
   document.body.classList.add(`flavor-${flavorId}`);
   localStorage.setItem('kb-flavor', flavorId);
 

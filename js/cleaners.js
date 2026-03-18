@@ -225,29 +225,36 @@ export function fixPunctuationSpacing(text) {
 // ── Registry ──
 
 export const cleaners = [
+  // Paste cleanup (most common workflows first)
+  { id: 'clean-code-paste', name: 'Clean Code Paste', fn: cleanCodePaste, category: 'whitespace' },
+  { id: 'unwrap-paragraphs', name: 'Unwrap Paragraphs', fn: unwrapParagraphs, category: 'whitespace' },
+  { id: 'normalize-unicode', name: 'Normalize Unicode', fn: normalizeUnicode, category: 'characters' },
+  // Whitespace
   { id: 'remove-extra-spaces', name: 'Remove Extra Spaces', fn: removeExtraSpaces, category: 'whitespace' },
   { id: 'remove-extra-returns', name: 'Remove Extra Returns', fn: removeExtraReturns, category: 'whitespace' },
+  { id: 'remove-blank-lines', name: 'Remove Blank Lines', fn: removeBlankLines, category: 'lines' },
+  { id: 'trim-whitespace', name: 'Trim Whitespace', fn: trimWhitespace, category: 'whitespace' },
   { id: 'strip-leading-indentation', name: 'Strip Leading Indentation', fn: stripLeadingIndentation, category: 'whitespace' },
   { id: 'remove-all-tabs', name: 'Remove All Tabs', fn: removeAllTabs, category: 'whitespace' },
-  { id: 'trim-whitespace', name: 'Trim Whitespace', fn: trimWhitespace, category: 'whitespace' },
   { id: 'rewrap-text', name: 'Rewrap Text', fn: rewrapText, category: 'whitespace' },
   { id: 'remove-forwarding-chars', name: 'Remove Forwarding Characters', fn: removeForwardingCharacters, category: 'whitespace' },
+  // Quotes & characters
+  { id: 'straighten-quotes', name: 'Straighten Quotes', fn: straightenQuotes, category: 'quotes' },
+  { id: 'smarten-quotes', name: 'Smarten Quotes', fn: smartenQuotes, category: 'quotes' },
+  { id: 'strip-emojis', name: 'Strip Emojis', fn: stripEmojis, category: 'characters' },
+  { id: 'remove-non-ascii', name: 'Remove Non-ASCII', fn: removeNonASCII, category: 'characters' },
+  // Case transforms
   { id: 'uppercase', name: 'UPPERCASE', fn: toUpperCase, category: 'transform' },
   { id: 'lowercase', name: 'lowercase', fn: toLowerCase, category: 'transform' },
   { id: 'title-case', name: 'Title Case', fn: toTitleCase, category: 'transform' },
   { id: 'sentence-case', name: 'Sentence Case', fn: toSentenceCase, category: 'transform' },
-  { id: 'straighten-quotes', name: 'Straighten Quotes', fn: straightenQuotes, category: 'quotes' },
-  { id: 'smarten-quotes', name: 'Smarten Quotes', fn: smartenQuotes, category: 'quotes' },
+  // Privacy & redaction
+  { id: 'strip-emails', name: 'Strip Emails', fn: stripEmails, category: 'privacy' },
+  { id: 'strip-urls', name: 'Strip URLs', fn: stripURLs, category: 'privacy' },
+  // Lines & structure
   { id: 'sort-lines', name: 'Sort Lines', fn: sortLines, category: 'lines' },
   { id: 'remove-duplicate-lines', name: 'Remove Duplicate Lines', fn: removeDuplicateLines, category: 'lines' },
   { id: 'extract-from-html', name: 'Extract from HTML', fn: extractFromHTML, category: 'transform' },
-  { id: 'unwrap-paragraphs', name: 'Unwrap Paragraphs', fn: unwrapParagraphs, category: 'whitespace' },
-  { id: 'clean-code-paste', name: 'Clean Code Paste', fn: cleanCodePaste, category: 'whitespace' },
-  { id: 'strip-emojis', name: 'Strip Emojis', fn: stripEmojis, category: 'characters' },
-  { id: 'remove-non-ascii', name: 'Remove Non-ASCII', fn: removeNonASCII, category: 'characters' },
-  { id: 'normalize-unicode', name: 'Normalize Unicode', fn: normalizeUnicode, category: 'characters' },
-  { id: 'strip-emails', name: 'Strip Emails', fn: stripEmails, category: 'privacy' },
-  { id: 'strip-urls', name: 'Strip URLs', fn: stripURLs, category: 'privacy' },
-  { id: 'remove-blank-lines', name: 'Remove Blank Lines', fn: removeBlankLines, category: 'lines' },
+  // Writing
   { id: 'fix-punctuation-spacing', name: 'Fix Punctuation Spacing', fn: fixPunctuationSpacing, category: 'writing' },
 ];

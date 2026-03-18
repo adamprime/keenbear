@@ -214,6 +214,58 @@ body.flavor-y2k.light-mode {
   --scrollbar-thumb: #808080;
 }
 
+/* 5. Salty Octopus - Pirate, nautical, treasure */
+body.flavor-pirate {
+  --bg: #0a1628; /* Deep ocean navy */
+  --bg-surface: #122040;
+  --bg-surface-hover: #1a2d52;
+  --bg-input: #070f1e;
+  --fg: #e8dcc8; /* Aged parchment */
+  --fg-muted: #8a7e6a;
+  --fg-dim: #5c5347;
+  --accent: #e8a838; /* Treasure gold */
+  --accent-hover: #d49630;
+  --accent-flash: rgba(232, 168, 56, 0.25);
+  --border: #2a3a5a;
+  --border-focus: #e8a838;
+  --btn-bg: #1a2d52;
+  --btn-bg-hover: #243a62;
+  --btn-fg: #e8dcc8;
+  --btn-disabled: #3a4a6a;
+  --status-bg: #070f1e;
+  --scrollbar-thumb: #3a4a6a;
+  --scrollbar-track: transparent;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Georgia', 'Times New Roman', serif;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --border-width: 2px;
+  --transition: 200ms ease;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.flavor-pirate.light-mode {
+  --bg: #f5edd4; /* Sandy parchment */
+  --bg-surface: #faf6e8;
+  --bg-surface-hover: #efe8d0;
+  --bg-input: #faf6e8;
+  --fg: #2a1e0e;
+  --fg-muted: #6b5d4a;
+  --fg-dim: #9a8c78;
+  --accent: #b8660a; /* Darker gold for contrast */
+  --accent-hover: #9a5508;
+  --accent-flash: rgba(184, 102, 10, 0.15);
+  --border: #d4c9a8;
+  --border-focus: #b8660a;
+  --btn-bg: #efe8d0;
+  --btn-bg-hover: #e4dbc0;
+  --btn-fg: #2a1e0e;
+  --btn-disabled: #c8bfa5;
+  --status-bg: #efe8d0;
+  --scrollbar-thumb: #c4b898;
+}
+
 /* ── Base ── */
 
 html, body {
@@ -286,6 +338,9 @@ body.flavor-y2k .header { background: var(--accent); color: white; border-bottom
 body.flavor-y2k .header-tagline { color: #fff; font-family: var(--font-mono); font-size: 0.7rem; }
 body.flavor-y2k .header-mascot { display: none; } /* Too modern */
 
+body.flavor-pirate .header-title { font-family: var(--font-display); font-size: 1.3rem; font-style: italic; letter-spacing: 0.03em; }
+body.flavor-pirate .header-tagline { font-family: var(--font-display); font-style: italic; }
+
 .header-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -354,6 +409,9 @@ body.flavor-artisanal .btn { font-weight: 400; text-transform: lowercase; }
 body.flavor-artisanal .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
 body.flavor-butler .btn { font-family: var(--font-sans); font-style: italic; }
+
+body.flavor-pirate .btn { font-family: var(--font-display); font-style: italic; }
+body.flavor-pirate .btn:hover:not(:disabled) { background: var(--accent); color: var(--bg); }
 
 body.flavor-y2k .btn { 
   border: 2px outset #fff;
@@ -562,6 +620,7 @@ body.flavor-y2k .text-area::-webkit-scrollbar-thumb {
   color: var(--fg-muted);
 }
 
+body.flavor-pirate .sidebar-title { font-family: var(--font-display); font-style: italic; color: var(--accent); }
 body.flavor-artisanal .sidebar-title { text-transform: lowercase; font-weight: normal; }
 body.flavor-butler .sidebar-title { font-style: italic; text-transform: none; font-weight: normal; font-size: 1rem; }
 body.flavor-y2k .sidebar-title { font-weight: bold; color: #000; text-transform: none; }
@@ -624,6 +683,8 @@ body.flavor-hazmat .cleaner-item { font-family: var(--font-display); text-transf
 body.flavor-artisanal .cleaner-item { text-transform: lowercase; font-weight: 300; }
 body.flavor-y2k .cleaner-item { color: #000; }
 body.flavor-y2k .cleaner-item:hover { background: var(--accent); color: #fff; }
+body.flavor-pirate .cleaner-item { font-family: var(--font-display); font-style: italic; }
+body.flavor-pirate .cleaner-item:hover { background: var(--accent); color: var(--bg); }
 
 .cleaner-item:hover {
   background: var(--bg-surface-hover);
@@ -797,6 +858,7 @@ body.flavor-y2k .find-match-count { color: #000; }
 body.flavor-artisanal .about-heading { text-transform: lowercase; font-weight: normal; }
 body.flavor-butler .about-heading { font-style: italic; text-transform: none; font-weight: normal; font-size: 1rem; }
 body.flavor-y2k .about-heading { font-weight: bold; color: #000; text-transform: none; }
+body.flavor-pirate .about-heading { font-family: var(--font-display); font-style: italic; text-transform: none; font-weight: normal; font-size: 1.1rem; color: var(--accent); }
 
 .about-content > p {
   font-size: 0.85rem;
@@ -828,6 +890,7 @@ body.flavor-y2k .about-content > p { color: #000; }
 body.flavor-artisanal .ref-category { text-transform: lowercase; font-weight: 400; }
 body.flavor-butler .ref-category { font-style: italic; text-transform: none; font-weight: normal; }
 body.flavor-y2k .ref-category { color: navy; }
+body.flavor-pirate .ref-category { font-family: var(--font-display); font-style: italic; text-transform: none; color: var(--accent); }
 
 .ref-item {
   margin-bottom: 20px;
@@ -844,6 +907,7 @@ body.flavor-hazmat .ref-item h4 { font-family: var(--font-display); text-transfo
 body.flavor-artisanal .ref-item h4 { font-weight: 400; }
 body.flavor-butler .ref-item h4 { font-style: italic; font-weight: normal; }
 body.flavor-y2k .ref-item h4 { color: #000; }
+body.flavor-pirate .ref-item h4 { font-family: var(--font-display); font-style: italic; color: var(--accent); }
 
 .ref-item p {
   font-size: 0.85rem;
@@ -893,6 +957,7 @@ body.flavor-hazmat .faq-item h3 { font-family: var(--font-display); text-transfo
 body.flavor-artisanal .faq-item h3 { font-weight: 400; }
 body.flavor-butler .faq-item h3 { font-style: italic; font-weight: normal; }
 body.flavor-y2k .faq-item h3 { color: #000; }
+body.flavor-pirate .faq-item h3 { font-family: var(--font-display); font-style: italic; color: var(--accent); }
 
 .faq-item p {
   font-size: 0.85rem;
@@ -983,6 +1048,7 @@ body.flavor-y2k .faq-item p { color: #000; }
   }
   
   body.flavor-hazmat .sidebar, body.flavor-y2k .sidebar { border-radius: 0; }
+  body.flavor-pirate .sidebar { border-radius: 12px 12px 0 0; }
 
   .sidebar.open {
     transform: translateY(0);
