@@ -27,10 +27,10 @@ node test/run-node.js
 
 | Module | Role |
 |--------|------|
-| `js/cleaners.js` | Pure `(text, options?) => text` functions + registry array |
+| `js/cleaners.js` | Pure `(text, options?) => text` functions + registry array (25 cleaners) |
 | `js/history.js` | Index-based undo/redo stack (20 levels, no-op dedupe) |
 | `js/find-replace.js` | Pattern compilation, match counting, replace with regex safety |
-| `js/ui.js` | All DOM manipulation, event handlers, rendering |
+| `js/ui.js` | All DOM manipulation, event handlers, rendering, keyboard shortcuts (Alt+1-9 cleaners, Alt+0 invisibles) |
 | `js/app.js` | Entry point — imports ui, calls `init()`, registers service worker |
 
 ### Key Patterns
@@ -38,6 +38,8 @@ node test/run-node.js
 - **Central mutation:** All text changes go through `applyTextChange(run, source)` in `ui.js`. This ensures consistent history tracking, status updates, and invisibles re-rendering.
 - **Cleaner contract:** Every cleaner is `fn(text, options?) => text`. Adding a new cleaner = write the function, add one entry to the `cleaners` array in `cleaners.js`, write tests.
 - **No framework abstractions.** Direct DOM manipulation. `document.getElementById`, `addEventListener`, `createElement`.
+- **Theme system:** 5 flavors (Salty Octopus default, Hazmat, Artisanal, Butler, Y2K) with `--font-display` for headings and `--font-sans` for body text. Each flavor has dark + light mode CSS variables and custom copy (tagline, placeholders, sidebar title).
+- **Keyboard shortcuts:** Alt/Option+1-9 for top 9 cleaners, Alt/Option+0 for invisibles. Uses `e.code` (not `e.key`) to avoid Mac composed character issues.
 
 ### Adding a New Cleaner
 
@@ -50,7 +52,7 @@ node test/run-node.js
 
 ## Testing
 
-- **99 tests** across 3 test files (history, cleaners, find-replace)
+- **143 tests** across 3 test files (history, cleaners, find-replace)
 - Browser harness: `test/test-runner.html` (opens in browser, renders results to DOM)
 - Node runner: `test/run-node.js` (minimal DOM shim for `extractFromHTML`)
 - Test framework is custom (no dependencies): `describe`, `it`, `assert.equal/ok/deepEqual/throws`
