@@ -52,9 +52,9 @@ node test/run-node.js
 
 ## Testing
 
-- **143 tests** across 3 test files (history, cleaners, find-replace)
+- **157 tests** across 3 test files (history, cleaners, find-replace)
 - Browser harness: `test/test-runner.html` (opens in browser, renders results to DOM)
-- Node runner: `test/run-node.js` (minimal DOM shim for `extractFromHTML`)
+- Node runner: `test/run-node.js` (no DOM shim needed; `extractFromHTML` is pure)
 - Test framework is custom (no dependencies): `describe`, `it`, `assert.equal/ok/deepEqual/throws`
 - TDD workflow: write failing tests first, implement to green
 
@@ -66,6 +66,7 @@ node test/run-node.js
 - Monospace font stack: `'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace`
 - Semantic HTML with ARIA labels for accessibility
 - `localStorage` keys are prefixed with `kb-` (e.g., `kb-theme`, `kb-invisibles`)
+- Bump `CACHE_VERSION` in `sw.js` for any deploy that changes a cached asset (see `docs/plans/2026-04-07-refactor-app-optimization-bundle-plan.md`, Phase 2)
 
 ## File Locations
 
@@ -79,8 +80,8 @@ node test/run-node.js
 - No server, no API calls, no data leaves the browser
 - Clipboard API requires secure context (HTTPS or localhost)
 - Regex patterns capped at 500 characters to prevent ReDoS
-- `extractFromHTML` uses `textContent` assignment (not `innerHTML` for output) to prevent XSS
-- Service worker uses cache-first strategy — no network requests in normal operation
+- `extractFromHTML` strips tags and decodes entities with a pure string pipeline; it does not rely on DOM parsing
+- Service worker uses stale-while-revalidate for shell assets and cache-first for images
 
 ## Known Limitations
 

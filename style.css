@@ -484,6 +484,31 @@ body.flavor-y2k .btn.active {
   margin: 0 4px;
 }
 
+.update-banner {
+  position: fixed;
+  right: 16px;
+  bottom: 44px;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 10px 12px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow);
+}
+
+.update-banner[hidden] {
+  display: none;
+}
+
+.update-banner-text {
+  font-size: 0.875rem;
+  color: var(--fg);
+}
+
 /* ── Main layout ── */
 
 .main {
@@ -1105,6 +1130,13 @@ body.flavor-y2k .faq-item p { color: #000; }
     gap: 4px;
     padding: 6px 10px;
     flex-wrap: wrap;
+  }
+
+  .update-banner {
+    right: 10px;
+    left: 10px;
+    bottom: 52px;
+    max-width: none;
   }
 
   .btn {

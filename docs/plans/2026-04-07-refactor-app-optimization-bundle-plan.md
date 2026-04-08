@@ -503,7 +503,7 @@ export function stripEmojis(text) {
 
 ### Phase 2 — Service Worker Caching Overhaul
 
-- [ ] **Unit 2.1: Switch the SW fetch handler to stale-while-revalidate for shell assets**
+- [x] **Unit 2.1: Switch the SW fetch handler to stale-while-revalidate for shell assets**
 
 **Goal:** Fresh deploys reach users on the next page load while preserving offline support.
 
@@ -570,7 +570,7 @@ fetch(request):
 
 ---
 
-- [ ] **Unit 2.2: Document the SW version-bump rule in `AGENTS.md`**
+- [x] **Unit 2.2: Document the SW version-bump rule in `AGENTS.md`**
 
 **Goal:** Future contributors don't ship cache-busting changes without bumping `CACHE_NAME`.
 

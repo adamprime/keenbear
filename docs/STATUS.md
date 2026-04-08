@@ -10,7 +10,7 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 
 **Phase:** V1.5 — feature expansion complete
 **Last Session:** 2026-04-07
-**Last Session Summary:** Deepened the optimization plan and completed Phase 1 correctness fixes on `fix/phase-1-cleaner-correctness` (cleaner regressions covered, `extractFromHTML` made pure, SW cache bumped to v6).
+**Last Session Summary:** Completed optimization bundle Phase 2 on `fix/phase-1-cleaner-correctness` with stale-while-revalidate shell caching, an in-app update banner, and `keenbear-v7` service worker caches.
 
 ## What's Working
 - Product specification: `keenbear-spec.md`
@@ -26,7 +26,7 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 - **`js/app.js`:** Entry point with service worker registration
 - **`index.html` + `style.css`:** Two-panel layout, 5 themes (dark/light each), responsive mobile bottom sheet, textarea constrained to 80ch, pinned status bar
 - **5 Theme Flavors:** Salty Octopus (default, pirate/nautical), Hazmat (brutalist), Artisanal (minimalist), Butler (formal), Y2K (retro)
-- **PWA:** manifest.json + service worker (v6) for offline/installable support
+- **PWA:** manifest.json + service worker (v7 shell/image caches) for offline/installable support, in-app refresh banner, and stale-while-revalidate shell updates
 - **GEO/SEO:** JSON-LD (WebApplication + FAQPage), robots.txt, llms.txt, sitemap.xml, netlify.toml, OG + Twitter Card meta, canonical URL
 - **About section:** Inline About prose → Cleaner Reference (monospace before/after examples for all 25 cleaners) → FAQ — all flavor-aware styled, below the fold
 
@@ -60,14 +60,14 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 | Netlify Deploy | Complete | main | Live at keenbear.com |
 | Favicon | Complete | main | Done |
 | V1.5 Feature Expansion | Complete | main | 9 new cleaners, pirate theme, shortcuts, reference docs |
-| Optimization bundle Phase 1 | Complete on branch | fix/phase-1-cleaner-correctness | Cleaner correctness fixes, pure HTML extraction, SW cache bump, 157 tests green |
+| Optimization bundle Phases 1-2 | Complete on branch | fix/phase-1-cleaner-correctness | Cleaner correctness fixes plus SW stale-while-revalidate, update banner, offline reload verified |
 
 ## What's Next
 <!-- Prioritized backlog. Top item = next thing to work on. -->
 
-1. **Optimization bundle Phase 2** — SW stale-while-revalidate + update notification
-2. **Optimization bundle Phase 3** — `ui.js` split + invisibles/status perf work
-3. **My Scrub** — chained cleaner feature (v2 headline feature)
+1. **Optimization bundle Phase 3** — `ui.js` split + invisibles/status perf work
+2. **My Scrub** — chained cleaner feature (v2 headline feature)
+3. **Mobile UX review** — verify shortcuts, reference section, pinned status bar on mobile
 
 ## Open Decisions
 <!-- Architectural or product decisions that haven't been made yet. -->
@@ -111,6 +111,16 @@ Single-page, client-only app (no server, no accounts, no external dependencies).
 
 ## Session Log
 <!-- Brief log of recent sessions. Newest first. Delete entries older than 30 days. -->
+
+### 2026-04-07 (session 7)
+- **Goal:** Execute Phase 2 of the optimization bundle
+- **Accomplished:**
+  - Switched `sw.js` to separate `keenbear-shell-v7` / `keenbear-images-v7` caches with stale-while-revalidate for shell assets and cache-first for images
+  - Removed unconditional `skipWaiting()` and added message-based activation plus an in-app “New version available” refresh banner
+  - Documented the cache-version bump rule in `AGENTS.md` and corrected its service-worker/testing notes
+  - Verified offline reload, cache contents, and the update-banner flow with `agent-browser` against an isolated temp server copy
+- **Didn't finish:** Phase 3 `ui.js` refactor/perf work
+- **Discovered:** The cleanest E2E way to verify the refresh banner is to update a temp copy of `sw.js` under a local server and force `registration.update()` from the page.
 
 ### 2026-04-07 (session 6)
 - **Goal:** Deepen the optimization plan and execute Phase 1 correctness fixes
