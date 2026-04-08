@@ -1,23 +1,6 @@
 // Node-based test runner for CI / quick validation
 // The canonical test runner is test-runner.html (browser-based)
 
-// Provide a minimal DOM shim for extractFromHTML
-globalThis.document = {
-  createElement(tag) {
-    return {
-      set innerHTML(val) { this._html = val; },
-      get value() {
-        return (this._html || '')
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'");
-      }
-    };
-  }
-};
-
 let currentSuite = null;
 const results = [];
 let total = 0, passed = 0, failed = 0;
