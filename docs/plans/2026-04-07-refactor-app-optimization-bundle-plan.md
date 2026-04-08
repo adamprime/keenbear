@@ -503,7 +503,7 @@ export function stripEmojis(text) {
 
 ### Phase 2 — Service Worker Caching Overhaul
 
-- [ ] **Unit 2.1: Switch the SW fetch handler to stale-while-revalidate for shell assets**
+- [x] **Unit 2.1: Switch the SW fetch handler to stale-while-revalidate for shell assets**
 
 **Goal:** Fresh deploys reach users on the next page load while preserving offline support.
 
@@ -570,7 +570,7 @@ fetch(request):
 
 ---
 
-- [ ] **Unit 2.2: Document the SW version-bump rule in `AGENTS.md`**
+- [x] **Unit 2.2: Document the SW version-bump rule in `AGENTS.md`**
 
 **Goal:** Future contributors don't ship cache-busting changes without bumping `CACHE_NAME`.
 
@@ -592,7 +592,7 @@ fetch(request):
 
 ### Phase 3 — `ui.js` Refactor and Interactive Perf
 
-- [ ] **Unit 3.1: Extract `FLAVORS` data and theme logic into `js/ui/flavors.js` + `js/ui/theme.js`**
+- [x] **Unit 3.1: Extract `FLAVORS` data and theme logic into `js/ui/flavors.js` + `js/ui/theme.js`**
 
 **Goal:** Reduce `ui.js` size and isolate the largest chunk of pure data so it's easy to add or change a flavor without scrolling through DOM code.
 
@@ -623,7 +623,7 @@ fetch(request):
 
 ---
 
-- [ ] **Unit 3.2: Rewrite `renderInvisibles` to be `requestAnimationFrame`-debounced and DOM-cheap**
+- [x] **Unit 3.2: Rewrite `renderInvisibles` to be `requestAnimationFrame`-debounced and DOM-cheap**
 
 **Goal:** Typing into a 100KB textarea with invisibles enabled stays under one frame per keystroke on the main thread.
 
@@ -664,7 +664,7 @@ fetch(request):
 
 ---
 
-- [ ] **Unit 3.3: Debounce `updateStatus` for large input and remove the always-on RAF loop**
+- [x] **Unit 3.3: Debounce `updateStatus` for large input and remove the always-on RAF loop**
 
 **Goal:** Status bar counts no longer recompute synchronously on every keystroke for large pastes.
 
@@ -688,7 +688,7 @@ fetch(request):
 
 ---
 
-- [ ] **Unit 3.4: Split the rest of `ui.js` into `dom.js`, `keyboard.js`, `find.js`, and `index.js`**
+- [x] **Unit 3.4: Split the rest of `ui.js` into `dom.js`, `keyboard.js`, `find.js`, and `index.js`**
 
 **Goal:** No file in `js/ui/` exceeds ~200 lines; each file has a single responsibility.
 
@@ -736,7 +736,7 @@ fetch(request):
 
 ---
 
-- [ ] **Unit 3.5: Update `TESTING_GUIDE.md`, `AGENTS.md`, `docs/STATUS.md`, and add a solution doc**
+- [x] **Unit 3.5: Update `TESTING_GUIDE.md`, `AGENTS.md`, `docs/STATUS.md`, and add a solution doc**
 
 **Goal:** Repo documentation reflects the new module layout and the `e.code` rule, and the perf fix is recorded as a solution for future contributors.
 

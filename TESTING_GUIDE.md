@@ -28,3 +28,17 @@
 ### `fixPunctuationSpacing`
 - `keeps closing quotes attached to punctuation`
 - `keeps closing brackets attached to punctuation`
+
+## Phase 3 regression coverage
+
+### `renderInvisiblesString`
+- `returns empty string for empty input`
+- `renders markers for spaces tabs and newlines`
+- `renders marker-only output for whitespace input`
+
+### `createKeydownHandler`
+- `runs the first cleaner for Alt+Digit1`
+- `toggles invisibles for Alt+Digit0`
+- `ignores composed Alt characters when the physical key is not a digit`
+- `opens the find panel for Cmd+F`
+- `closes the find panel on Escape when open`

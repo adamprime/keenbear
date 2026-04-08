@@ -30,12 +30,18 @@ node test/run-node.js
 | `js/cleaners.js` | Pure `(text, options?) => text` functions + registry array (25 cleaners) |
 | `js/history.js` | Index-based undo/redo stack (20 levels, no-op dedupe) |
 | `js/find-replace.js` | Pattern compilation, match counting, replace with regex safety |
-| `js/ui.js` | All DOM manipulation, event handlers, rendering, keyboard shortcuts (Alt+1-9 cleaners, Alt+0 invisibles) |
+| `js/ui/dom.js` | DOM refs, history-backed mutation helpers, cleaner list rendering, status updates |
+| `js/ui/flavors.js` | Pure flavor copy/theme data |
+| `js/ui/theme.js` | Theme and flavor initialization/toggling |
+| `js/ui/invisibles.js` | Invisibles rendering, scroll sync, large-document guard |
+| `js/ui/find.js` | Find & Replace panel wiring |
+| `js/ui/keyboard.js` | Keyboard shortcut handler factory (`e.code` for Alt+digits) |
+| `js/ui/index.js` | UI composition root and event wiring |
 | `js/app.js` | Entry point — imports ui, calls `init()`, registers service worker |
 
 ### Key Patterns
 
-- **Central mutation:** All text changes go through `applyTextChange(run, source)` in `ui.js`. This ensures consistent history tracking, status updates, and invisibles re-rendering.
+- **Central mutation:** Most text changes go through `applyTextChange(run, source)` in `js/ui/dom.js`. Paste still has a documented second mutation path in `handlePasteEvent()`, and both paths must keep history/status/invisibles hooks aligned.
 - **Cleaner contract:** Every cleaner is `fn(text, options?) => text`. Adding a new cleaner = write the function, add one entry to the `cleaners` array in `cleaners.js`, write tests.
 - **No framework abstractions.** Direct DOM manipulation. `document.getElementById`, `addEventListener`, `createElement`.
 - **Theme system:** 5 flavors (Salty Octopus default, Hazmat, Artisanal, Butler, Y2K) with `--font-display` for headings and `--font-sans` for body text. Each flavor has dark + light mode CSS variables and custom copy (tagline, placeholders, sidebar title).
@@ -52,9 +58,9 @@ node test/run-node.js
 
 ## Testing
 
-- **143 tests** across 3 test files (history, cleaners, find-replace)
+- **165 tests** across 5 test files (history, cleaners, find-replace, ui-invisibles, ui-keyboard)
 - Browser harness: `test/test-runner.html` (opens in browser, renders results to DOM)
-- Node runner: `test/run-node.js` (minimal DOM shim for `extractFromHTML`)
+- Node runner: `test/run-node.js` (no DOM shim needed; `extractFromHTML` is pure)
 - Test framework is custom (no dependencies): `describe`, `it`, `assert.equal/ok/deepEqual/throws`
 - TDD workflow: write failing tests first, implement to green
 
@@ -66,6 +72,7 @@ node test/run-node.js
 - Monospace font stack: `'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace`
 - Semantic HTML with ARIA labels for accessibility
 - `localStorage` keys are prefixed with `kb-` (e.g., `kb-theme`, `kb-invisibles`)
+- Bump `CACHE_VERSION` in `sw.js` for any deploy that changes a cached asset (see `docs/plans/2026-04-07-refactor-app-optimization-bundle-plan.md`, Phase 2)
 
 ## File Locations
 
@@ -79,11 +86,11 @@ node test/run-node.js
 - No server, no API calls, no data leaves the browser
 - Clipboard API requires secure context (HTTPS or localhost)
 - Regex patterns capped at 500 characters to prevent ReDoS
-- `extractFromHTML` uses `textContent` assignment (not `innerHTML` for output) to prevent XSS
-- Service worker uses cache-first strategy — no network requests in normal operation
+- `extractFromHTML` strips tags and decodes entities with a pure string pipeline; it does not rely on DOM parsing
+- Service worker uses stale-while-revalidate for shell assets and cache-first for images
 
 ## Known Limitations
 
-- Show Invisibles overlay can jank on very large documents (10k+ lines)
+- Show Invisibles auto-disables on very large documents (~500KB) to avoid jank
 - `textarea` native undo and custom history coexist via a `lastActionWasCleaner` flag — edge cases possible with rapid mixed input
 - IME composition events are guarded but not exhaustively tested across all input methods

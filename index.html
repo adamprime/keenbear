@@ -116,7 +116,10 @@
     ]
   }
   </script>
-  <link rel="icon" href="keenbear.png" type="image/png">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a1a2e">
   <link rel="stylesheet" href="style.css">
@@ -154,6 +157,11 @@
     <button id="btn-invisibles" class="btn" title="Show invisible characters">¶ <kbd class="btn-shortcut" data-mac="⌥0" data-other="Alt+0"></kbd></button>
     <div class="toolbar-separator"></div>
     <button id="btn-find" class="btn" title="Find & Replace">Find <kbd class="btn-shortcut" data-mac="⌘F" data-other="Ctrl+F"></kbd></button>
+  </div>
+
+  <div id="update-banner" class="update-banner" role="status" aria-live="polite" hidden>
+    <span class="update-banner-text">New version available.</span>
+    <button id="btn-refresh-app" class="btn btn-sm">Refresh</button>
   </div>
 
   <div id="find-replace-panel" class="find-replace-panel" hidden>
@@ -464,6 +472,7 @@ After:   Hello. World, this is great! Right?</code></pre>
       <span id="status-chars">chars: 0</span>
       <span id="status-words">words: 0</span>
       <span id="status-lines">lines: 0</span>
+      <span id="status-note" class="status-note" hidden></span>
     </div>
     <div class="status-credit">
       Built by <a href="https://adamtervort.com" target="_blank" rel="noopener">Adam Tervort</a>
