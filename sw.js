@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const SHELL_CACHE = `keenbear-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `keenbear-images-${CACHE_VERSION}`;
 const SHELL_ASSETS = [
@@ -24,6 +24,14 @@ const SHELL_ASSETS = [
 const IMAGE_ASSETS = [
   '/keenbear.png',
   '/og-image.png',
+  '/favicon.ico',
+  '/favicon-16x16.png',
+  '/favicon-32x32.png',
+  '/apple-touch-icon.png',
+  '/android-chrome-192x192.png',
+  '/android-chrome-512x512.png',
+  '/android-chrome-maskable-192x192.png',
+  '/android-chrome-maskable-512x512.png',
 ];
 const ACTIVE_CACHES = new Set([SHELL_CACHE, IMAGE_CACHE]);
 const SHELL_DESTINATIONS = new Set(['document', 'script', 'style', 'manifest']);

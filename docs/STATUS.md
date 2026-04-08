@@ -10,7 +10,7 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 
 **Phase:** V1.5 — feature expansion complete
 **Last Session:** 2026-04-07
-**Last Session Summary:** Completed optimization bundle Phase 3 on `fix/phase-1-cleaner-correctness` by splitting `ui.js` into focused modules, improving invisibles/status performance, and bumping the service worker caches to `keenbear-v8`.
+**Last Session Summary:** Fixed the post-refactor runtime import issue and polished favicon/app icons with dedicated browser, iOS, and Android maskable assets plus a `keenbear-v9` cache bump.
 
 ## What's Working
 - Product specification: `keenbear-spec.md`
@@ -26,8 +26,7 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 - **`js/ui/*`:** Split UI modules for DOM, flavors/theme, invisibles, keyboard, find, and composition-root wiring
 - **`index.html` + `style.css`:** Two-panel layout, 5 themes (dark/light each), responsive mobile bottom sheet, textarea constrained to 80ch, pinned status bar
 - **5 Theme Flavors:** Salty Octopus (default, pirate/nautical), Hazmat (brutalist), Artisanal (minimalist), Butler (formal), Y2K (retro)
-- **PWA:** manifest.json + service worker (v7 shell/image caches) for offline/installable support, in-app refresh banner, and stale-while-revalidate shell updates
-- **PWA:** manifest.json + service worker (v8 shell/image caches) for offline/installable support, in-app refresh banner, and stale-while-revalidate shell updates
+- **PWA:** manifest.json + service worker (v9 shell/image caches) for offline/installable support, in-app refresh banner, stale-while-revalidate shell updates, and dedicated browser/iOS/Android icon assets
 - **About section:** Inline About prose → Cleaner Reference (monospace before/after examples for all 25 cleaners) → FAQ — all flavor-aware styled, below the fold
 
 ### Cleaners (25 total, priority-ordered in sidebar)
@@ -122,6 +121,16 @@ Single-page, client-only app (no server, no accounts, no external dependencies).
   - Verified keyboard shortcuts, invisibles toggling, browser test harness, cache contents, and offline reload with `agent-browser`
 - **Didn't finish:** No new product feature work beyond the optimization bundle
 - **Discovered:** Exporting factory functions from `keyboard.js` and `invisibles.js` keeps the new modules easy to test in Node without a DOM shim.
+
+### 2026-04-07 (session 9)
+- **Goal:** Evaluate mobile UX and polish favicon/app icons
+- **Accomplished:**
+  - Fixed the `js/ui/index.js` runtime import regression found during mobile evaluation
+  - Evaluated the mobile layout in iPhone emulation: cleaner drawer, status bar, and long reference/FAQ scroll all work
+  - Generated dedicated `favicon.ico`, `16x16`, `32x32`, Apple touch, Android 192/512, and maskable icon assets from a head-focused Keen Bear crop
+  - Updated `index.html`, `manifest.json`, and `sw.js` so browser tabs, installs, and offline caches use the new icon set
+- **Didn't finish:** Optional Safari pinned-tab icon / SVG favicon work
+- **Discovered:** The mascot’s full-body art is too detailed for small favicon sizes; a head-focused crop reads much better at `16x16` and `32x32`.
 
 ### 2026-04-07 (session 7)
 - **Goal:** Execute Phase 2 of the optimization bundle
