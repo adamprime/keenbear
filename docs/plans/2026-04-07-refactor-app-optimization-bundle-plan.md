@@ -3,10 +3,30 @@ title: "refactor: App optimization bundle (correctness, caching, structure, perf
 type: refactor
 status: active
 date: 2026-04-07
+deepened: 2026-04-07
 origin: null  # No upstream brainstorm — derived from in-conversation code review on 2026-04-07
 ---
 
 # refactor: App optimization bundle (correctness, caching, structure, perf)
+
+## Deepening Summary
+
+**Deepened on:** 2026-04-07
+**Research agents used:** stripEmojis regex, SW caching strategies, extractFromHTML pure impl, invisibles overlay perf, JS module splitting, plan correctness review
+
+### Factual Corrections
+1. **`style.css` is NOT missing from `sw.js` ASSETS.** The plan's Problem Frame, R3, and Unit 1.4 incorrectly claim it is. It is present at line 5 of `sw.js`. Unit 1.4 should be reduced to a cache version bump only.
+2. **`handlePasteEvent` bypasses `applyTextChange`.** The plan claims a single mutation seam but paste events directly modify `textarea.value` and call `history.push` independently (lines 376-393 of `ui.js`). The refactor should either route paste through `applyTextChange` or explicitly document this as a second mutation path.
+3. **`stripEmojis` regex is more complex than described.** The plan says it uses `\p{Emoji}`. The actual regex is `\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Component}(?!\d)` — it already has a `(?!\d)` lookahead but still fails on `#` and `*`.
+4. **Line numbers off:** `renderInvisibles` is at line 412 (not 399), `syncScroll` at line 443 (not 431).
+5. **`sw.js` ASSETS update is missing from Unit 3.4's file list.** When `ui.js` moves to `ui/index.js`, `sw.js` must update its `/js/ui.js` entry.
+
+### Key Research Improvements
+1. **stripEmojis: Use emoji-regex-xs pattern instead of `\p{Extended_Pictographic}`.** The plan's D1 proposal has critical gaps: misses keycap emoji (1️⃣), flags (🇺🇸), orphans skin tone modifiers. The emoji-regex-xs pattern (~200 bytes) handles all emoji types atomically in a single pass with no ZWJ cleanup needed.
+2. **extractFromHTML: Add `<br>`/block element → newline conversion and `<script>`/`<style>` stripping.** Without these, block structure collapses to a single line and CSS rules leak as visible text. Map `&nbsp;` to regular space, not `\u00A0`.
+3. **SW: Use message-based `skipWaiting` + "new version available" notification** instead of unconditional `skipWaiting()`. Prevents mixed old+new asset race condition. ~20 lines of JS + a hidden banner.
+4. **Invisibles: Add `requestIdleCallback` debouncing, `contain: strict` CSS, `replaceChildren()`, and `cloneNode(true)` templates** to the performance toolkit. Consider a hard cap (~500KB) where invisibles auto-disable.
+5. **Module split: `sw.js` ASSETS update is the #1 risk.** Must replace `/js/ui.js` with all 7 new paths. Consider `modulepreload` hints in `index.html` (nice-to-have). Use setter functions for shared `let` state across modules.
 
 ## Overview
 
@@ -23,7 +43,7 @@ The work is sequenced so each phase can ship independently and so risk increases
 Keen Bear V1.5 is feature-complete and deployed at keenbear.com. A code-review pass surfaced a cluster of issues that the test suite did not catch and that will only get worse as feature surface grows:
 
 - Two cleaners produce incorrect output on common inputs (`stripEmojis` mangles digits/`#`/`*`; `extractFromHTML` round-trips through `textarea.innerHTML`, which is brittle for inputs with stray `<`).
-- The service worker (`sw.js v5`) is **cache-first with no revalidation**, and its asset manifest is **missing `style.css`** — a deployed bug where offline users can see unstyled HTML and online users can be pinned to a stale JS bundle indefinitely.
+- The service worker (`sw.js v5`) is **cache-first with no revalidation** ~~and its asset manifest is **missing `style.css`**~~ — (**CORRECTION:** `style.css` IS present in the ASSETS array; the manifest is complete but the caching *strategy* is the problem) online users can be pinned to a stale JS bundle indefinitely with no mechanism to receive updates.
 - `js/ui.js` has grown to 563 lines and conflates DOM, theme strings, keyboard shortcuts, find/replace wiring, the invisibles overlay, and mobile sheet logic. It also re-renders the invisibles overlay (one DOM node per character) on every keystroke when active, which janks on large pastes — a common Keen Bear use case.
 
 The work is internal-quality oriented. Users don't get new features, but they get correct cleaners, reliable updates, complete offline support, and a UI that doesn't stutter on big pastes.
@@ -32,7 +52,7 @@ The work is internal-quality oriented. Users don't get new features, but they ge
 
 - **R1.** `stripEmojis` must not remove ASCII digits, `#`, or `*` from input that contains no actual emoji.
 - **R2.** `extractFromHTML` must correctly handle inputs containing stray `<` characters and HTML entities, in both browser and Node test runners.
-- **R3.** The service worker manifest must include every asset required to render the app offline (notably `style.css`).
+- **R3.** The service worker manifest must include every asset required to render the app offline. ~~(notably `style.css`)~~ (**CORRECTION:** `style.css` is already present. R3 is satisfied for the current manifest but must be re-verified after the Phase 3 module split adds new file paths.)
 - **R4.** A new deploy must reach existing users on the **next page load** (not "two loads later" or "after a hard refresh"), without breaking offline support.
 - **R5.** `js/ui.js` must be split into focused modules each with a single responsibility, preserving every existing behavior and keyboard shortcut.
 - **R6.** With "Show Invisibles" enabled, typing into a 100KB+ textarea must not block the main thread for more than one frame per keystroke.
@@ -44,7 +64,7 @@ The work is internal-quality oriented. Users don't get new features, but they ge
 
 **In scope:**
 - Cleaner correctness fixes for `stripEmojis`, `extractFromHTML`, `stripURLs` (trailing punctuation), `fixPunctuationSpacing` (closing quotes/brackets).
-- Adding `style.css` to the SW manifest, switching update strategy, version bump strategy.
+- ~~Adding `style.css` to the SW manifest~~ (already present), switching update strategy, version bump strategy, update notification banner.
 - Splitting `ui.js` into modules; moving `FLAVORS` data out; making `renderInvisibles` and `updateStatus` non-blocking on large input.
 
 **Out of scope (explicit non-goals):**
@@ -82,14 +102,86 @@ The work is internal-quality oriented. Users don't get new features, but they ge
 
 ## Key Technical Decisions
 
-- **D1. `stripEmojis` switches to `\p{Extended_Pictographic}` + ZWJ joiner cleanup.**
-  *Rationale:* `\p{Emoji}` matches `0-9`, `#`, and `*`, which is the root cause of the current correctness bug. `\p{Extended_Pictographic}` is the Unicode standard for "actual emoji glyphs" and is supported in all evergreen browsers and Node ≥ 12. ZWJ sequences (`\u200D`) and emoji modifier/variation selectors (`\uFE0F`, `\uFE0E`) are stripped after the main pass to clean up orphans.
+- **D1. `stripEmojis` switches to the emoji-regex-xs pattern (adapted, inlined).** ~~Originally proposed `\p{Extended_Pictographic}` + ZWJ cleanup.~~
+  *Rationale:* `\p{Extended_Pictographic}` alone has critical gaps: misses keycap sequences (1️⃣), flag sequences (🇺🇸, which use Regional Indicators not in ExtPict), and orphans skin tone modifiers and tag characters. The emoji-regex-xs pattern (MIT licensed, ~200 bytes, 115k npm dependents) handles ALL emoji types atomically in a single regex pass — no separate ZWJ cleanup needed.
+
+  *Pattern (compile once at module scope):*
+  ```js
+  const _base = String.raw`\p{Emoji}(?:\p{EMod}|[\u{E0020}-\u{E007E}]+\u{E007F}|\uFE0F?\u20E3?)`;
+  const _emojiRe = new RegExp(
+    String.raw`\p{RI}{2}|(?![#*\d](?!\uFE0F?\u20E3))${_base}(?:\u200D${_base})*`,
+    'gu'
+  );
+  ```
+
+  *How it works:* `\p{RI}{2}` catches flags. The negative lookahead `(?![#*\d](?!\uFE0F?\u20E3))` preserves bare digits/`#`/`*` while still stripping keycap emoji like 1️⃣. The rest handles ZWJ chains, skin tones, and tag sequences atomically. Browser support: all evergreen browsers since 2020 (Chrome 64+, Firefox 78+, Safari 11.1+).
+
+  *Edge cases to note:* `©` and `®` are stripped (have `Emoji` property). `♡` is preserved (no `Emoji` property). This is generally the desired behavior for "strip emoji."
 
 - **D2. `extractFromHTML` becomes pure (no DOM) and decodes entities inline.**
   *Rationale:* The current `textarea.innerHTML = ...` approach is fragile (re-parses stray `<`), forces a DOM shim in the Node test runner, and is the only cleaner that breaks the "pure function" contract. Replacing it with a small entity map (already prototyped in the Node shim) makes the cleaner pure, removes the DOM dependency, and lets us delete the shim. Numeric entities (`&#39;`, `&#x27;`) must be supported in addition to the named entities the shim already handles. This is a small, well-bounded function.
 
+  ### Research Enhancement: extractFromHTML Implementation Details
+
+  **Entity decoder:** Single regex pass matching `&(name);`, `&#(decimal);`, `&#x(hex);` — resolved via a ~35 entry named map + `String.fromCodePoint()` for numeric/hex. Single-pass avoids the XSS bug where multi-pass decoding converts `&amp;#60;` to `<`. Unknown named entities pass through unchanged.
+
+  **Essential named entities (~35, covers >99% of pasted HTML):**
+  - XML core 5: `amp`, `lt`, `gt`, `quot`, `apos`
+  - Spaces: `nbsp` (→ regular space U+0020, not `\u00A0`), `ensp`, `emsp`, `thinsp`
+  - Dashes: `ndash`, `mdash`
+  - Quotes: `lsquo`, `rsquo`, `ldquo`, `rdquo`, `sbquo`, `bdquo`, `laquo`, `raquo`
+  - Punctuation: `bull`, `hellip`, `middot`, `prime`, `Prime`
+  - Symbols: `copy`, `reg`, `trade`, `euro`, `pound`, `cent`, `deg`, `sect`, `para`, `micro`
+  - Math: `times`, `divide`, `plusmn`, `frac12`, `frac14`, `frac34`
+  - Zero-width: `zwj`, `zwnj`
+
+  **Additional pre-passes (not in original plan):**
+  1. **Strip `<script>` and `<style>` blocks entirely** (content + tags) before general tag stripping. Without this, CSS rules leak as visible text when pasting from web pages: `text.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '')`
+  2. **Strip HTML comments:** `text.replace(/<!--[\s\S]*?-->/g, '')`
+  3. **Convert `<br>` → `\n` and block elements (`<p>`, `<div>`, `<h1-6>`, `<li>`, `<tr>`, `<blockquote>`) → `\n`** before stripping remaining tags. Without this, all block structure collapses to a single line, which is rarely what the user wants.
+
+  **`&nbsp;` mapping:** Map to regular space `' '` (U+0020), not non-breaking space `\u00A0`. A text cleaning tool should produce clean text — `\u00A0` causes subtle bugs in downstream processing.
+
 - **D3. Service worker switches to "stale-while-revalidate for shell, cache-first for images, network-first for nothing."**
   *Rationale:* Keen Bear is a static-asset PWA. The shell (HTML/CSS/JS) needs to update reliably without breaking offline. Stale-while-revalidate gives users an instant load from cache and quietly fetches the fresh version in the background, so they get the new build on the **second** load — at most one stale render. Combined with `clients.claim()` (already present) and a precache step that always loads the new manifest on `install`, users on a stale tab still get the update on next refresh. Pure-cache-first would be wrong because it strands users on old builds; pure network-first would break offline.
+
+  ### Research Enhancement: Service Worker Strategy Details
+
+  **Critical change: Remove unconditional `skipWaiting()` from install.** The current `self.skipWaiting()` in the install handler creates a race condition where a new SW activates immediately, potentially serving a mix of old (HTML from page load) and new (JS/CSS from new SW) assets. Replace with **message-based skipWaiting:**
+
+  ```js
+  // In sw.js — remove self.skipWaiting() from install, add:
+  self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+      self.skipWaiting();
+    }
+  });
+  ```
+
+  ```js
+  // In app.js — detect waiting SW, show update banner:
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          showUpdateBanner(newWorker); // "New version available — click to refresh"
+        }
+      });
+    });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload(); // Atomic reload with all-new assets
+  });
+  ```
+
+  **"New version available" notification:** Strongly recommended. Without it, SWR silently updates the cache and users get new content on their second visit — but if they keep a tab open, they run stale code indefinitely. A small toast/banner (~20 lines of JS + a hidden banner in HTML) fully solves the "two refresh" problem.
+
+  **Separate caches:** Use `keenbear-shell-vN` for HTML/JS/CSS and `keenbear-images-vN` for images. This allows independent versioning and simpler cache cleanup.
+
+  **Netlify-specific notes:** Netlify serves static assets with `Cache-Control: public, max-age=0, must-revalidate` by default. This means SWR's network fetch always gets fresh content from Netlify's CDN. No custom headers needed. Netlify deploys are atomic — no risk of partial deploy.
+
+  **Cache key matching:** Default `caches.match()` uses the full URL. Ensure both `/` and `/index.html` are cached (or use `{ ignoreSearch: true }` if query strings are ever appended).
 
 - **D4. SW cache version derives from a single constant at the top of `sw.js`, bumped per release.**
   *Rationale:* No build step exists, so we cannot inject a hash. A manual constant is the simplest reliable signal and matches the `v5` pattern already used. Document the bump rule in `AGENTS.md` so future changes don't drop it.
@@ -105,14 +197,63 @@ The work is internal-quality oriented. Users don't get new features, but they ge
   - `js/ui/index.js` — re-exports `init()` so `app.js` import path stays `./ui.js` via a one-line shim, OR `app.js` is updated to import `./ui/index.js`. Decision deferred to implementation; both are one-line changes.
   *Rationale for not extracting more aggressively:* the mobile sheet and toolbar handlers are small enough to live in `dom.js` or `index.js`. Premature splitting hurts more than it helps.
 
-- **D6. Invisibles re-rendering moves to a single batched node, scheduled in `requestAnimationFrame`, with the per-keystroke trigger debounced.**
-  *Rationale:* The current implementation creates one `<span>` per character. For a 100KB paste that's 100k DOM nodes per keystroke. The replacement strategy: build a single string with the substitution characters inserted (`·`, `→`, `¶`) and assign it to the overlay's `textContent` once. Wrap that in `requestAnimationFrame` so consecutive keystrokes coalesce to one render per frame. CSS handles the visual styling of invisibles via background color or pseudo-classes; no per-character span needed for the basic version. **Caveat:** if differential coloring per invisible type is required for parity with the current look, fall back to building **one span per *run* of normal text** rather than per character — still a 1000x reduction for typical text. This is captured as a sub-decision in Unit 3.2.
+  ### Research Enhancement: Module Split Implementation Details
+
+  **Circular dependency prevention:** Enforce a strict DAG (Directed Acyclic Graph) import flow:
+  ```
+  flavors.js (pure data, zero imports)
+       ↓
+  theme.js (imports flavors.js)
+       ↓
+  dom.js (the "hub" — imports from ../history.js, ../cleaners.js, ../find-replace.js ONLY)
+       ↓
+  keyboard.js, invisibles.js, find.js (import from dom.js, never from each other)
+       ↓
+  index.js (imports all, exports init())
+  ```
+  **Rule:** `dom.js` must ONLY import from outside `ui/`. Document this constraint in a comment at the top of `dom.js`. If `dom.js` ever imports from a sibling module, Node ES modules will surface a confusing partial-export TDZ error.
+
+  **Shared mutable state:** The current `ui.js` has `let lastActionWasCleaner`, `let composing`, `let invisiblesActive`, `let rafId`. These must live in `dom.js` (the hub). Since `export let` only allows reassignment from the declaring module, use **setter functions** (e.g., `export function setLastActionWasCleaner(v) { lastActionWasCleaner = v; }`) or wrap in an object: `export const state = { lastActionWasCleaner: false }` (siblings can mutate properties directly).
+
+  **`init()` cross-module wiring:** The `textarea` `input` event handler (line 542-546 in current `init()`) calls `updateStatus()`, `updateMatchCount()`, and `renderInvisibles()` directly — NOT through `applyTextChange`. After the split, `init()` in `index.js` must import these from `dom.js`, `find.js`, and `invisibles.js` respectively. This is a concrete wiring point to verify.
+
+  **Remove the shim — don't keep `js/ui.js`.** Since only `js/app.js` imports `js/ui.js`, change the import in `app.js` to `'./ui/index.js'`. A one-line re-export shim adds an unnecessary file and potential cache confusion. The plan already notes this as "implementer's choice" — research recommends the cleaner option.
+
+  **SW ASSETS update (CRITICAL — #1 risk of the split):** `sw.js` currently lists `/js/ui.js` in the ASSETS array. After the split, this must be replaced with all 7 new module paths. If this is missed, existing users' service workers will try to serve the old cached `ui.js`, then the sub-module fetches will miss the cache and either go to network (online) or fail (offline). **Add `sw.js` to Unit 3.4's file list.**
+
+  **`modulepreload` hints (nice-to-have):** Add `<link rel="modulepreload" href="/js/ui/dom.js">` etc. to `index.html` for the sub-modules. This eliminates the 1-level waterfall on first cold load (browser can't discover sub-modules until it fetches `index.js`). Marginal benefit since SW caches all assets after first visit, but it's free. All modern browsers support `rel="modulepreload"` (Chrome 66+, Firefox 115+, Safari 17+).
+
+  **Module evaluation order:** DOM refs (`document.getElementById(...)`) execute at module evaluation time. ES modules are always deferred, so this is safe as long as the `<script type="module">` is in `<body>`. Verified: `index.html` has `<script type="module" src="js/app.js"></script>` at the end of `<body>`. No issue.
+
+- **D6. Invisibles re-rendering moves to "one span per run" batched rendering, debounced with `requestIdleCallback`.**
+  *Rationale:* The current implementation creates one `<span>` per character. For a 100KB paste that's 100k DOM nodes per keystroke. ~~Originally proposed a single `textContent` assignment.~~ Research confirms CSS-only approaches are not viable for character-level invisible markers — JavaScript DOM rendering is required.
+
+  ### Research Enhancement: Invisibles Performance Toolkit (priority order)
+
+  | Priority | Technique | Impact | Complexity |
+  |----------|-----------|--------|------------|
+  | 1 | **"One span per run" rendering** — group consecutive visible chars into a single text node, only create `<span>` for invisible markers | ~5-10× fewer DOM nodes | Low |
+  | 2 | **`replaceChildren(frag)`** instead of `textContent = '' + appendChild()` | ~10-20% faster DOM update | Trivial |
+  | 3 | **`requestIdleCallback` debounce** on input event (fall back to `setTimeout(fn, 0)` for Safari <16.4) | Eliminates typing lag — rIC is superior to rAF because it naturally adapts to device speed and batches rapid keystrokes | Low |
+  | 4 | **Passive scroll event listener** (replace rAF polling) | Saves CPU/battery, prevents leaked animation loops | Low |
+  | 5 | **`contain: strict` CSS** on overlay element | Free layout/paint optimization — tells browser rendering changes inside overlay can't affect outside | Trivial |
+  | 6 | **`cloneNode(true)` for marker spans** — pre-create template spans at module scope | ~5-10% faster element creation vs createElement+set each time | Low |
+  | 7 | **Size cap with auto-disable** (~500KB) with status message | Prevents browser hang on huge pastes | Low |
+
+  *How code editors do it:* CodeMirror 6 uses a `MatchDecorator` that only processes visible ranges with incremental updates. Monaco uses GPU canvas rendering. Both are far more complex than needed here. The "one span per run" approach is the right balance for Keen Bear's scope.
+
+  *CSS enhancement:* Add `contain: strict` and `pointer-events: none` (likely already present) to the overlay. `pointer-events: none` actually improves Chrome's scroll compositing by preventing hit-test recalculations. Consider `will-change: scroll-position` on the overlay as a compositor layer hint.
+
+  *Future escalation path (out of scope):* If "one span per run" + rIC isn't enough, the next step is `content-visibility: auto` on line-level `<div>`s (~45% improvement per Nolan Lawson's measurements), then full windowed/virtual rendering.
 
 - **D7. `syncScroll` switches from an always-on RAF loop to a `scroll` event listener.**
-  *Rationale:* The textarea fires `scroll` events; there is no reason to wake the main thread 60 times a second when nothing is scrolling. The current loop only exists because `scroll` event-based sync was probably tried first and had a flicker, but a scroll-event listener with `{ passive: true }` is the standard approach and matches what the textarea actually does.
+  *Rationale:* The textarea fires `scroll` events; there is no reason to wake the main thread 60 times a second when nothing is scrolling. The current loop only exists because `scroll` event-based sync was probably tried first and had a flicker, but a scroll-event listener with `{ passive: true }` is the standard approach and matches what the textarea actually does. Research confirms the 1-frame lag concern is typically imperceptible. Adding `will-change: scroll-position` or `overflow: hidden` on the overlay (since it's programmatically scrolled) can help the browser promote it to its own compositor layer.
 
 - **D8. `updateStatus` debounces to `requestAnimationFrame` when the input is large.**
   *Rationale:* Counts are visual feedback, not load-bearing state. A one-frame delay on a 1MB textarea is invisible to users and avoids re-trimming and re-splitting per keystroke. Small inputs continue to update synchronously so the test harness and the small-input UX feel unchanged.
+
+- **D9. (NEW) `handlePasteEvent` should route through `applyTextChange` or be explicitly documented as a second mutation path.**
+  *Rationale:* The plan states "Every text change in the app routes through `applyTextChange`" but this is factually incorrect — `handlePasteEvent` (lines 376-393 of `ui.js`) directly modifies `textarea.value` and calls `history.push`, `updateStatus`, `updateUndoRedoButtons`, and `renderInvisibles` independently. During the Phase 3 module split, each of these cross-module calls must be maintained. The cleanest fix is to refactor `handlePasteEvent` to use `applyTextChange` with a selection-aware variant, or if that's too disruptive, add a comment in `dom.js` explicitly documenting both mutation paths so future module additions don't silently miss one.
 
 ## Open Questions
 
@@ -178,7 +319,7 @@ docs/STATUS.md              ── refresh after each phase merge
 
 ### Phase 1 — Correctness Fixes
 
-- [ ] **Unit 1.1: Fix `stripEmojis` correctness**
+- [x] **Unit 1.1: Fix `stripEmojis` correctness**
 
 **Goal:** `stripEmojis` no longer removes ASCII digits, `#`, or `*` while still removing all real emoji including ZWJ sequences and skin tone modifiers.
 
@@ -191,21 +332,38 @@ docs/STATUS.md              ── refresh after each phase merge
 - Test: `test/cleaners.test.js` (new `describe` block additions)
 
 **Approach:**
-- Replace the current `\p{Emoji}`-based regex with `\p{Extended_Pictographic}` plus a follow-up pass for `\uFE0F`, `\uFE0E`, and orphaned `\u200D` joiners.
+- Replace the current regex with the emoji-regex-xs pattern (see D1 above). Compile the regex once at module scope. Single pass — no follow-up ZWJ cleanup needed.
 - Do not change the function signature or registry entry.
 
-**Execution note:** Test-first. Add the failing cases (digits, `#`, `*`, mixed text-with-emoji, family ZWJ sequence, skin-tone modifier) before touching the implementation.
+**Implementation sketch:**
+```js
+const _base = String.raw`\p{Emoji}(?:\p{EMod}|[\u{E0020}-\u{E007E}]+\u{E007F}|\uFE0F?\u20E3?)`;
+const _emojiRe = new RegExp(
+  String.raw`\p{RI}{2}|(?![#*\d](?!\uFE0F?\u20E3))${_base}(?:\u200D${_base})*`,
+  'gu'
+);
+
+export function stripEmojis(text) {
+  if (!text) return '';
+  return text.replace(_emojiRe, '');
+}
+```
+
+**Execution note:** Test-first. Add the failing cases (digits, `#`, `*`, mixed text-with-emoji, family ZWJ sequence, skin-tone modifier, flags, keycaps) before touching the implementation.
 
 **Patterns to follow:** existing `stripEmojis` function in `js/cleaners.js` and the `describe`/`it` style in `test/cleaners.test.js`.
 
 **Test scenarios:**
-- `"call 911"` → unchanged
-- `"#hashtag *bold*"` → unchanged
+- `"call 911"` → unchanged (digits preserved)
+- `"#hashtag *bold*"` → unchanged (`#` and `*` preserved)
 - `"hi 👋 world"` → `"hi  world"`
-- `"👨‍👩‍👧‍👦 family"` → `" family"` (ZWJ family removed cleanly, no orphaned ZWJ)
-- `"thumbs 👍🏽 up"` → `"thumbs  up"` (skin tone modifier removed)
-- `"flag 🇺🇸"` → `"flag "` (regional indicator pair removed)
+- `"👨‍👩‍👧‍👦 family"` → `" family"` (ZWJ family removed atomically, no orphaned ZWJ)
+- `"thumbs 👍🏽 up"` → `"thumbs  up"` (skin tone modifier removed with base emoji)
+- `"flag 🇺🇸"` → `"flag "` (regional indicator pair removed — this FAILS with `\p{Extended_Pictographic}`)
+- `"dial 1️⃣ now"` → `"dial  now"` (keycap emoji stripped, but bare `1` preserved — this FAILS with `\p{Extended_Pictographic}`)
+- `"🏴󠁧󠁢󠁥󠁮󠁧󠁿 England"` → `" England"` (tag sequence flag removed cleanly)
 - Empty string → empty string (existing test continues to pass)
+- **Edge case:** `"© 2026"` → `" 2026"` (copyright sign has Emoji property — acceptable behavior, document it)
 
 **Verification:**
 - `node test/run-node.js` reports the new tests passing and all existing tests still green.
@@ -213,7 +371,7 @@ docs/STATUS.md              ── refresh after each phase merge
 
 ---
 
-- [ ] **Unit 1.2: Make `extractFromHTML` pure and update tests**
+- [x] **Unit 1.2: Make `extractFromHTML` pure and update tests**
 
 **Goal:** `extractFromHTML` no longer touches the DOM, handles stray `<`, and supports numeric entities.
 
@@ -227,8 +385,12 @@ docs/STATUS.md              ── refresh after each phase merge
 - Test: `test/cleaners.test.js` (new cases)
 
 **Approach:**
-- Strip tags with the existing `<[^>]*>` regex (acceptable because this cleaner is for "extract text from HTML I pasted," not a sanitizer).
-- Decode entities inline using a small map: `&amp; &lt; &gt; &quot; &#39;` plus a `&#(\d+);` and `&#x([0-9a-fA-F]+);` handler.
+1. **Pre-pass: strip `<script>` and `<style>` blocks** (content + tags): `text.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '')`
+2. **Pre-pass: strip HTML comments:** `text.replace(/<!--[\s\S]*?-->/g, '')`
+3. **Convert block elements to newlines:** `<br>` → `\n`, `</p>`, `</div>`, `</h1-6>`, `</li>`, `</tr>`, `</blockquote>` → `\n`
+4. **Strip remaining tags** with `<[^>]*>` regex (acceptable because this is "extract text from pasted HTML," not a sanitizer).
+5. **Decode entities** inline using the ~35 named entity map (see D2 above) + numeric `&#(\d+);` + hex `&#x([0-9a-fA-F]+);` via `String.fromCodePoint()`. Single regex pass to avoid multi-pass XSS bug.
+6. **Collapse excessive newlines:** `\n{3,}` → `\n\n` (same as `removeExtraReturns` does).
 - Cleaner becomes a pure `(text) => text` function with no DOM dependency, restoring the contract every other cleaner already follows.
 - Delete the Node test runner's `document` shim now that nothing needs it.
 
@@ -237,12 +399,21 @@ docs/STATUS.md              ── refresh after each phase merge
 **Patterns to follow:** Other pure cleaners in `js/cleaners.js` (`normalizeUnicode` is the closest analog — string-in, string-out, regex-replace pipeline).
 
 **Test scenarios:**
-- `"<p>Hello <b>world</b></p>"` → `"Hello world"` (existing test continues to pass)
+- `"<p>Hello <b>world</b></p>"` → `"\nHello world\n"` or `"Hello world"` (depends on whether output is trimmed — consider `.trim()` at the end)
 - `"&amp;&lt;&gt;&quot;&#39;"` → `"&<>\"'"`
 - `"&#65;&#x42;"` → `"AB"` (numeric and hex entities)
 - `"a < b and c > d"` → `"a < b and c > d"` (stray `<`/`>` survive — current implementation mangles this)
-- `"<script>alert(1)</script>safe"` → `"alert(1)safe"` (tags stripped, no execution)
+- `"<script>alert(1)</script>safe"` → `"safe"` (script block stripped entirely — improved from original plan's `"alert(1)safe"`)
+- `"<style>.foo{color:red}</style>Hello"` → `"Hello"` (style block stripped entirely)
+- `"<!-- comment -->visible"` → `"visible"` (comment stripped)
+- `"<p>para one</p><p>para two</p>"` → `"para one\npara two"` (block structure preserved as newlines)
+- `"line one<br>line two"` → `"line one\nline two"` (`<br>` → newline)
+- `"&nbsp;&nbsp;indented"` → `"  indented"` (`&nbsp;` → regular space)
 - Empty string → empty string
+
+**Tag stripping edge cases (acceptable limitations):**
+- `<div data-x="a<b">` (< in attribute) — may misparse. Extremely rare in pasted HTML; browsers normalize attributes before copy.
+- Unclosed `<br` at end of string — left as text. Correct behavior for stray `<`.
 
 **Verification:**
 - All `extractFromHTML` tests pass under both `node test/run-node.js` and the browser harness.
@@ -250,7 +421,7 @@ docs/STATUS.md              ── refresh after each phase merge
 
 ---
 
-- [ ] **Unit 1.3: Tighten `stripURLs` and `fixPunctuationSpacing` edges**
+- [x] **Unit 1.3: Tighten `stripURLs` and `fixPunctuationSpacing` edges**
 
 **Goal:** Both cleaners handle the trailing-punctuation and closing-quote/bracket cases that the current implementations miss.
 
@@ -281,24 +452,26 @@ docs/STATUS.md              ── refresh after each phase merge
 
 ---
 
-- [ ] **Unit 1.4: Add `style.css` to the SW manifest and bump cache version**
+- [x] **Unit 1.4: ~~Add `style.css` to the SW manifest and~~ Bump cache version for Phase 1 changes**
 
-**Goal:** Offline users render the app with full styling.
+**Goal:** ~~Offline users render the app with full styling.~~ Force existing users to pick up the Phase 1 cleaner fixes via a new cache version.
 
-**Requirements:** R3
+**CORRECTION:** `style.css` is already present in the `ASSETS` array (line 5 of `sw.js`). The original plan's claim that it was missing was factually incorrect. This unit is reduced to a cache version bump only.
 
-**Dependencies:** None (this is a one-character change but lives in Phase 1 because it's a correctness fix, not a strategy change)
+**Requirements:** R3, R4
+
+**Dependencies:** Units 1.1–1.3 (so the cache carries the fixed cleaners)
 
 **Files:**
-- Modify: `sw.js` (`ASSETS` array + `CACHE_NAME`)
+- Modify: `sw.js` (`CACHE_NAME` only)
 
 **Approach:**
-- Insert `'/style.css'` into the `ASSETS` array.
 - Bump `CACHE_NAME` from `keenbear-v5` to `keenbear-v6`.
+- Verify the ASSETS array is already complete (it is).
 
 **Test scenarios:** (manual; no automated SW tests in this repo)
 - Load the deployed app, hard-refresh to install the new SW, go offline (DevTools → Network → Offline), reload — app renders styled.
-- Confirm via DevTools → Application → Cache Storage that `style.css` is in the `keenbear-v6` cache.
+- Confirm via DevTools → Application → Cache Storage that `keenbear-v6` cache exists and contains all assets.
 
 **Verification:**
 - Offline reload of the app shows the Salty Octopus theme intact.
@@ -306,7 +479,7 @@ docs/STATUS.md              ── refresh after each phase merge
 
 ---
 
-- [ ] **Unit 1.5: Update `TESTING_GUIDE.md` and `docs/STATUS.md` for Phase 1**
+- [x] **Unit 1.5: Update `TESTING_GUIDE.md` and `docs/STATUS.md` for Phase 1**
 
 **Goal:** Repo TDD documentation rule stays satisfied; status reflects Phase 1.
 
@@ -352,16 +525,35 @@ docs/STATUS.md              ── refresh after each phase merge
 **Technical design:** *(directional, not implementation specification)*
 
 ```
+install:
+    precache SHELL_ASSETS + IMAGE_ASSETS (ensures offline from first visit)
+    DO NOT call skipWaiting() — use message-based activation (see D3)
+
+activate:
+    delete old caches not in [SHELL_CACHE, IMAGE_CACHE]
+    clients.claim()
+
+message:
+    if event.data.type === 'SKIP_WAITING' → self.skipWaiting()
+
 fetch(request):
-    if shell(request):
+    if not same-origin GET → passthrough
+    if shell(request):  // HTML, JS, CSS, manifest
         cached = match(request)
-        revalidate = fetch(request).then(put-in-cache)
+        revalidate = fetch(request).then(response => {
+            if response.ok → cache.put(request, response.clone())
+            return response
+        }).catch(() => null)  // network failure is fine — we have cache
         return cached ?? await revalidate
-    if image(request):
+    if image(request):  // png, jpg, svg, ico, webp
         cached = match(request)
         return cached ?? fetch+cache(request)
     return fetch(request)
 ```
+
+**Separate caches:** `keenbear-shell-v7` for HTML/JS/CSS and `keenbear-images-v7` for images. Independent versioning and simpler cleanup.
+
+**Update notification in `app.js`:** Detect `updatefound` → `installed` state on new SW → show a small "New version available — [Refresh]" banner. On click, send `SKIP_WAITING` message to waiting SW. On `controllerchange`, `window.location.reload()` for atomic update. ~20 lines.
 
 **Patterns to follow:** Existing `sw.js` install/activate handlers — keep the same single-file shape and avoid introducing helper modules. Service worker stays under 100 lines.
 
@@ -369,6 +561,8 @@ fetch(request):
 - Deploy two consecutive builds with a visible CSS change. Confirm the second build appears on the second reload, not the third.
 - Take the app offline after install, reload — full app loads with current cache.
 - Modify a JS file locally, hard-refresh, confirm the change appears on the **next** soft reload without DevTools intervention.
+- **New:** Verify the "New version available" banner appears after deploying a change. Clicking it reloads with new content.
+- **New:** Verify no mixed-asset loading (all resources from same SW version) by checking Network tab after update.
 
 **Verification:**
 - Stale-build situation no longer reproducible without DevTools cache clearing.
@@ -443,12 +637,13 @@ fetch(request):
 - Test: `test/ui-invisibles.test.js` (new file — covers the pure helper)
 
 **Approach:**
-- Split rendering into two functions:
-  1. `renderInvisiblesString(text)` — pure, returns a string with `·` for spaces, `→` followed by a tab for tabs, and `¶` before each newline. Testable in Node with no DOM.
-  2. `renderInvisibles()` — DOM side: assigns the result of (1) to `invisiblesOverlay.textContent` once. No per-character spans.
-- Wrap `renderInvisibles` in a single `requestAnimationFrame` queue: if a render is already pending for the next frame, don't schedule another.
-- If color-per-glyph styling is required for parity with the current look, fall back to a "one span per *run* of normal text" approach where `invisiblesOverlay.replaceChildren(...)` is called with an array of text nodes and `<span>` elements for the marker characters. Implementer makes this call after a visual comparison against the current `Show Invisibles` look.
-- Replace the always-on `syncScroll` RAF loop with a `textarea.addEventListener('scroll', ..., { passive: true })` listener that copies `scrollTop`/`scrollLeft` to the overlay. Cancel the old RAF loop on toggle-off.
+- Split rendering into two layers:
+  1. `renderInvisiblesNodes(text)` — pure function, returns a `DocumentFragment` using the "one span per run" strategy: consecutive visible characters become a single text node, invisible characters (`space`, `tab`, `newline`) get a `<span>` with the appropriate class and marker character. **Use pre-created template spans** (`cloneNode(true)`) for marker elements — measurably faster than `createElement` + set class + textContent each time.
+  2. `renderInvisibles()` — DOM side: calls `invisiblesOverlay.replaceChildren(renderInvisiblesNodes(text))`. Use `replaceChildren()` instead of `textContent = '' + appendChild()` (~10-20% faster, atomic DOM update).
+- Wrap `renderInvisibles` in a `requestIdleCallback` queue (with `setTimeout(fn, 0)` fallback for Safari <16.4): if a render is already pending, don't schedule another. rIC is superior to rAF for this use case because it naturally adapts to device speed and batches rapid keystrokes — the overlay is a visual aid, not load-bearing UI, so a small delay is acceptable.
+- **Add `contain: strict` CSS** to the overlay element — free layout/paint optimization. Also ensure `pointer-events: none` is set (improves Chrome scroll compositing).
+- **Add a size cap** (~500KB): auto-disable invisibles with a status message for very large pastes, preventing browser hang.
+- Replace the always-on `syncScroll` RAF loop with a `textarea.addEventListener('scroll', ..., { passive: true })` listener that copies `scrollTop`/`scrollLeft` to the overlay. The 1-frame lag concern is typically imperceptible. Consider `will-change: scroll-position` on the overlay for compositor layer promotion.
 
 **Execution note:** Test-first for the pure `renderInvisiblesString` helper. The DOM side is verified manually.
 
@@ -502,11 +697,13 @@ fetch(request):
 **Dependencies:** Units 3.1–3.3 (so the moved code is already in its final shape)
 
 **Files:**
-- Create: `js/ui/dom.js` — element refs, `applyTextChange`, `updateStatus`, `updateUndoRedoButtons`, mobile sheet handlers, toolbar handlers
+- Create: `js/ui/dom.js` — element refs, `applyTextChange`, `updateStatus`, `updateUndoRedoButtons`, mobile sheet handlers, toolbar handlers. **Add a comment at the top documenting the DAG constraint: this module must only import from outside `ui/` (../history.js, ../cleaners.js, ../find-replace.js). Also document the `handlePasteEvent` second mutation path.**
 - Create: `js/ui/keyboard.js` — `handleKeydown`, with a comment re-asserting the `e.code` Mac convention from `docs/solutions/ui-bugs/mac-alt-number-keyboard-shortcuts.md`
 - Create: `js/ui/find.js` — find/replace panel wiring (`openFindPanel`, `closeFindPanel`, `updateMatchCount`, `handleReplaceAll`, etc.)
 - Create: `js/ui/index.js` — re-exports `init()` so it can be imported as before
-- Modify: `js/ui.js` — becomes a one-line `export { init } from './ui/index.js'` shim, OR is deleted and `js/app.js` imports `./ui/index.js` directly. Implementer's choice based on diff size.
+- **Delete: `js/ui.js`** and update `js/app.js` import to `'./ui/index.js'` directly (no shim — cleaner diff, avoids cache confusion)
+- **Modify: `sw.js`** — replace `/js/ui.js` in ASSETS with all new module paths: `/js/ui/index.js`, `/js/ui/dom.js`, `/js/ui/theme.js`, `/js/ui/flavors.js`, `/js/ui/keyboard.js`, `/js/ui/invisibles.js`, `/js/ui/find.js`. Bump `CACHE_NAME`.
+- **Consider: `index.html`** — add `<link rel="modulepreload">` hints for the sub-modules (nice-to-have, marginal benefit with SW cache)
 - Test: `test/ui-keyboard.test.js` — new tests for the `e.code` branch
 
 **Approach:**
@@ -575,10 +772,15 @@ fetch(request):
 ## Risks & Dependencies
 
 - **R-1: Phase 2 cache strategy regression.** A miswritten stale-while-revalidate handler could leave users on a stale build forever (worst case) or break offline (other worst case). *Mitigation:* test by deploying twice in a row to a staging Netlify branch (Netlify supports branch deploys) before promoting to keenbear.com. Confirm both "next-load freshness" and offline behavior on the staging URL.
-- **R-2: Phase 3 invisibles perf change loses visual fidelity.** The single-`textContent` rendering may lose per-character coloring. *Mitigation:* the plan explicitly captures the run-based span fallback in D6 and Unit 3.2; the implementer should compare visually before settling on the simpler approach.
-- **R-3: Phase 3 module split introduces a circular import.** `dom.js` is imported by `theme.js`, `keyboard.js`, `find.js`, and `invisibles.js`. If `dom.js` ever imports from any of those, Node ES modules will surface a confusing partial-export error. *Mitigation:* `dom.js` must only import from `js/cleaners.js`, `js/history.js`, and `js/find-replace.js`. Document this in a comment at the top of `dom.js`.
+- **R-1b: (NEW) Phase 2 mixed-asset race condition.** Unconditional `skipWaiting()` can serve a mix of old HTML and new JS/CSS on SW update. *Mitigation:* Switch to message-based `skipWaiting` + "new version available" notification with atomic reload on `controllerchange` (see D3 enhancement).
+- **R-2: Phase 3 invisibles perf change loses visual fidelity.** ~~The single-`textContent` rendering may lose per-character coloring.~~ The "one span per run" approach preserves per-glyph CSS classes for invisible markers. *Mitigation:* visual comparison against current `Show Invisibles` before shipping.
+- **R-3: Phase 3 module split introduces a circular import.** `dom.js` is imported by `theme.js`, `keyboard.js`, `find.js`, and `invisibles.js`. If `dom.js` ever imports from any of those, Node ES modules will surface a confusing partial-export TDZ error. *Mitigation:* `dom.js` must only import from `js/cleaners.js`, `js/history.js`, and `js/find-replace.js`. Document this in a comment at the top of `dom.js`.
+- **R-3b: (NEW) Phase 3 `sw.js` ASSETS not updated after module split.** If `sw.js` still lists `/js/ui.js` after the split, existing users' SW cache misses on sub-module fetches, breaking offline. *Mitigation:* Add `sw.js` to Unit 3.4 file list explicitly. Replace `/js/ui.js` with all 7 new paths.
+- **R-3c: (NEW) `export let` shared state across modules.** Only the declaring module can reassign an `export let`. Siblings see the live value but can't write to it. *Mitigation:* Use setter functions or wrap in an object (`export const state = { ... }`).
 - **R-4: TDD doc rule drift.** It's easy to add a test and forget `TESTING_GUIDE.md`. *Mitigation:* Units 1.5 and 3.5 explicitly require the doc update as a checklist item. Phase 2 has no new tests so there's no doc drift risk there.
 - **R-5: `extractFromHTML` entity handling regression.** Removing the DOM dependency means we own the entity decoder. *Mitigation:* the new implementation must support a strict superset of the existing 5 entities, plus numeric/hex. Tests in Unit 1.2 cover the additions.
+- **R-5b: (NEW) `extractFromHTML` `<br>`/block element behavior change.** Adding newline conversion for block elements changes the output for existing inputs. *Mitigation:* Update existing test expectations. The new behavior (preserving block structure) is more correct than the current behavior (collapsing everything to one line).
+- **R-6: (NEW) `stripEmojis` strips `©` and `®`.** The emoji-regex-xs pattern matches these because they have the `Emoji` property. *Mitigation:* Document this as expected behavior. Users who want to preserve `©`/`®` can use the existing `normalizeUnicode` cleaner instead.
 
 ## Phased Delivery
 

@@ -344,12 +344,38 @@ describe('extractFromHTML', () => {
     assert.equal(extractFromHTML('&amp; &lt; &gt; &quot;'), '& < > "');
   });
 
+  it('decodes numeric and hex entities', () => {
+    assert.equal(extractFromHTML('&#65;&#x42;'), 'AB');
+  });
+
   it('handles empty string', () => {
     assert.equal(extractFromHTML(''), '');
   });
 
   it('handles nested tags', () => {
     assert.equal(extractFromHTML('<div><p>hello <strong>world</strong></p></div>'), 'hello world');
+  });
+
+  it('preserves stray angle brackets that are not tags', () => {
+    assert.equal(extractFromHTML('a < b and c > d'), 'a < b and c > d');
+  });
+
+  it('strips script, style, and comment blocks', () => {
+    assert.equal(
+      extractFromHTML('<style>.foo{color:red}</style><!-- comment --><script>alert(1)</script>safe'),
+      'safe'
+    );
+  });
+
+  it('preserves block and line breaks as newlines', () => {
+    assert.equal(
+      extractFromHTML('<p>para one</p><p>para two</p><br>line three'),
+      'para one\npara two\nline three'
+    );
+  });
+
+  it('maps nbsp to regular spaces', () => {
+    assert.equal(extractFromHTML('&nbsp;&nbsp;indented'), '  indented');
   });
 });
 
@@ -418,6 +444,26 @@ describe('stripEmojis', () => {
 
   it('removes multi-codepoint emojis', () => {
     assert.equal(stripEmojis('test 👨‍👩‍👧‍👦 end'), 'test  end');
+  });
+
+  it('preserves bare digits and strips keycap emoji', () => {
+    assert.equal(stripEmojis('call 911 or press 1️⃣ now'), 'call 911 or press  now');
+  });
+
+  it('preserves bare hash and asterisk characters', () => {
+    assert.equal(stripEmojis('#hashtag *bold*'), '#hashtag *bold*');
+  });
+
+  it('removes skin tone modifiers with the emoji', () => {
+    assert.equal(stripEmojis('thumbs 👍🏽 up'), 'thumbs  up');
+  });
+
+  it('removes flags and tag-sequence emoji', () => {
+    assert.equal(stripEmojis('flag 🇺🇸 and 🏴 England'), 'flag  and  England');
+  });
+
+  it('strips emoji-property symbols like copyright', () => {
+    assert.equal(stripEmojis('© 2026'), ' 2026');
   });
 
   it('handles text with no emojis', () => {
@@ -508,6 +554,14 @@ describe('stripURLs', () => {
     assert.equal(stripURLs('go to www.example.com now'), 'go to  now');
   });
 
+  it('preserves trailing sentence punctuation after a URL', () => {
+    assert.equal(stripURLs('see https://example.com.'), 'see .');
+  });
+
+  it('preserves a closing parenthesis after a URL', () => {
+    assert.equal(stripURLs('visit (https://example.com) now'), 'visit () now');
+  });
+
   it('handles text with no URLs', () => {
     assert.equal(stripURLs('hello world'), 'hello world');
   });
@@ -554,6 +608,14 @@ describe('fixPunctuationSpacing', () => {
 
   it('adds space after exclamation and question marks', () => {
     assert.equal(fixPunctuationSpacing('What?Really!Yes'), 'What? Really! Yes');
+  });
+
+  it('keeps closing quotes attached to punctuation', () => {
+    assert.equal(fixPunctuationSpacing('"hi,"he said'), '"hi," he said');
+  });
+
+  it('keeps closing brackets attached to punctuation', () => {
+    assert.equal(fixPunctuationSpacing('Done.)Next'), 'Done.) Next');
   });
 
   it('does not add space after punctuation at end of line', () => {

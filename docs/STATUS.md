@@ -1,5 +1,5 @@
 # Project Status
-<!-- Updated: 2026-03-17 -->
+<!-- Updated: 2026-04-07 -->
 
 ## Project Overview
 Keen Bear is a free, dark-mode-first text cleaning utility for the web where users paste plain text, run one-click cleaners, and get cleaned output locally in the browser with no account required.
@@ -9,8 +9,8 @@ Keen Bear is a free, dark-mode-first text cleaning utility for the web where use
 V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete with 25 cleaners, 5 themes, keyboard shortcuts, and full reference documentation.
 
 **Phase:** V1.5 — feature expansion complete
-**Last Session:** 2026-03-17
-**Last Session Summary:** Added 9 new cleaners (25 total), Salty Octopus pirate theme, keyboard shortcuts, pinned status bar, cleaner reference section, layout and UX fixes.
+**Last Session:** 2026-04-07
+**Last Session Summary:** Deepened the optimization plan and completed Phase 1 correctness fixes on `fix/phase-1-cleaner-correctness` (cleaner regressions covered, `extractFromHTML` made pure, SW cache bumped to v6).
 
 ## What's Working
 - Product specification: `keenbear-spec.md`
@@ -18,15 +18,15 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 - Deepened implementation plan: `docs/plans/2026-03-07-feat-keenbear-v1-text-cleaning-app-plan.md`
 - Git initialized with remote `git@github.com:adamprime/keenbear.git`
 - **Deployed** to Netlify at keenbear.com
-- **Test harness:** `test/test-runner.html` (browser) + `test/run-node.js` (Node CLI) — 143 tests all green
+- **Test harness:** `test/test-runner.html` (browser) + `test/run-node.js` (Node CLI) — 157 tests all green
 - **`js/history.js`:** Index-based undo/redo stack — 20-level depth, no-op dedupe (14 tests)
-- **`js/cleaners.js`:** 25 cleaner functions with registry pattern, priority-ordered (108 tests)
+- **`js/cleaners.js`:** 25 cleaner functions with registry pattern, priority-ordered (122 tests)
 - **`js/find-replace.js`:** Pattern compilation, match counting, replace all with regex safety (21 tests)
 - **`js/ui.js`:** Full UI wiring — cleaners, toolbar, keyboard shortcuts (Alt+1-9 for cleaners, Alt+0 for invisibles), filter, find/replace panel, show invisibles, platform-aware shortcut badges
 - **`js/app.js`:** Entry point with service worker registration
 - **`index.html` + `style.css`:** Two-panel layout, 5 themes (dark/light each), responsive mobile bottom sheet, textarea constrained to 80ch, pinned status bar
 - **5 Theme Flavors:** Salty Octopus (default, pirate/nautical), Hazmat (brutalist), Artisanal (minimalist), Butler (formal), Y2K (retro)
-- **PWA:** manifest.json + service worker (v5) for offline/installable support
+- **PWA:** manifest.json + service worker (v6) for offline/installable support
 - **GEO/SEO:** JSON-LD (WebApplication + FAQPage), robots.txt, llms.txt, sitemap.xml, netlify.toml, OG + Twitter Card meta, canonical URL
 - **About section:** Inline About prose → Cleaner Reference (monospace before/after examples for all 25 cleaners) → FAQ — all flavor-aware styled, below the fold
 
@@ -60,13 +60,14 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 | Netlify Deploy | Complete | main | Live at keenbear.com |
 | Favicon | Complete | main | Done |
 | V1.5 Feature Expansion | Complete | main | 9 new cleaners, pirate theme, shortcuts, reference docs |
+| Optimization bundle Phase 1 | Complete on branch | fix/phase-1-cleaner-correctness | Cleaner correctness fixes, pure HTML extraction, SW cache bump, 157 tests green |
 
 ## What's Next
 <!-- Prioritized backlog. Top item = next thing to work on. -->
 
-1. **My Scrub** — chained cleaner feature (v2 headline feature)
-2. **Mobile UX review** — verify shortcuts, reference section, pinned status bar on mobile
-3. **Diff view** — before/after split pane (v2 idea)
+1. **Optimization bundle Phase 2** — SW stale-while-revalidate + update notification
+2. **Optimization bundle Phase 3** — `ui.js` split + invisibles/status perf work
+3. **My Scrub** — chained cleaner feature (v2 headline feature)
 
 ## Open Decisions
 <!-- Architectural or product decisions that haven't been made yet. -->
@@ -110,6 +111,18 @@ Single-page, client-only app (no server, no accounts, no external dependencies).
 
 ## Session Log
 <!-- Brief log of recent sessions. Newest first. Delete entries older than 30 days. -->
+
+### 2026-04-07 (session 6)
+- **Goal:** Deepen the optimization plan and execute Phase 1 correctness fixes
+- **Accomplished:**
+  - Deepened `docs/plans/2026-04-07-refactor-app-optimization-bundle-plan.md` with research-backed decisions and corrected false assumptions (`style.css` already cached, paste is a second mutation path)
+  - Fixed `stripEmojis` to preserve bare digits, `#`, and `*` while still stripping keycaps, flags, skin tones, and tag-sequence emoji
+  - Rewrote `extractFromHTML` as a pure function with script/style/comment stripping, named + numeric entity decoding, newline preservation, and no DOM dependency
+  - Tightened `stripURLs` to preserve trailing punctuation and `fixPunctuationSpacing` to respect closing quotes/brackets
+  - Removed the Node DOM shim from `test/run-node.js`, added `TESTING_GUIDE.md`, and bumped the service worker cache to `keenbear-v6`
+  - Expanded the suite from 143 to 157 passing tests
+- **Didn't finish:** Phase 2 SW strategy update, Phase 3 `ui.js` refactor/perf work
+- **Discovered:** A single-pass entity decoder avoids accidental double-decoding, and preserving post-URL punctuation is easiest as a replacement callback rather than a larger URL regex.
 
 ### 2026-03-17 (session 5)
 - **Goal:** Feature expansion — new cleaners, pirate theme, keyboard shortcuts, UX improvements

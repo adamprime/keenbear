@@ -138,12 +138,75 @@ export function removeDuplicateLines(text) {
   }).join('\n');
 }
 
+const HTML_ENTITY_MAP = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  ensp: ' ',
+  emsp: ' ',
+  thinsp: ' ',
+  ndash: '–',
+  mdash: '—',
+  lsquo: '‘',
+  rsquo: '’',
+  ldquo: '“',
+  rdquo: '”',
+  sbquo: '‚',
+  bdquo: '„',
+  laquo: '«',
+  raquo: '»',
+  bull: '•',
+  hellip: '…',
+  middot: '·',
+  prime: '′',
+  Prime: '″',
+  copy: '©',
+  reg: '®',
+  trade: '™',
+  euro: '€',
+  pound: '£',
+  cent: '¢',
+  deg: '°',
+  sect: '§',
+  para: '¶',
+  micro: 'µ',
+  times: '×',
+  divide: '÷',
+  plusmn: '±',
+  frac12: '½',
+  frac14: '¼',
+  frac34: '¾',
+  zwj: '\u200D',
+  zwnj: '\u200C',
+};
+
+function decodeHtmlEntity(match, named, decimal, hex) {
+  if (named) return HTML_ENTITY_MAP[named] ?? match;
+
+  const codePoint = Number.parseInt(decimal ?? hex, decimal ? 10 : 16);
+  if (!Number.isFinite(codePoint)) return match;
+
+  try {
+    return String.fromCodePoint(codePoint);
+  } catch {
+    return match;
+  }
+}
+
 export function extractFromHTML(text) {
   if (!text) return '';
-  const stripped = text.replace(/<[^>]*>/g, '');
-  const textarea = document.createElement('textarea');
-  textarea.innerHTML = stripped;
-  return textarea.value;
+  return text
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(?:p|div|h[1-6]|li|tr|blockquote|section|article|ul|ol|table|thead|tbody|tfoot|pre)>/gi, '\n')
+    .replace(/<\/?[A-Za-z][^>]*>/g, '')
+    .replace(/&([A-Za-z][A-Za-z0-9]+);|&#(\d+);|&#x([0-9a-fA-F]+);/g, decodeHtmlEntity)
+    .replace(/\n{2,}/g, '\n')
+    .replace(/^\n+|\n+$/g, '');
 }
 
 // ── Paragraph / Paste Cleaners ──
@@ -170,10 +233,15 @@ export function cleanCodePaste(text) {
 
 // ── Character Cleaners ──
 
+const EMOJI_REGEX_BASE = String.raw`\p{Emoji}(?:\p{EMod}|[\u{E0020}-\u{E007E}]+\u{E007F}|\uFE0F?\u20E3?)`;
+const EMOJI_REGEX = new RegExp(
+  String.raw`\p{RI}{2}|(?![#*\d](?!\uFE0F?\u20E3))${EMOJI_REGEX_BASE}(?:\u200D${EMOJI_REGEX_BASE})*`,
+  'gu'
+);
+
 export function stripEmojis(text) {
   if (!text) return '';
-  return text.replace(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Component}(?!\d)/gu, '')
-    .replace(/\u200D/g, '');
+  return text.replace(EMOJI_REGEX, '');
 }
 
 export function removeNonASCII(text) {
@@ -201,10 +269,15 @@ export function stripEmails(text) {
   return text.replace(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g, '');
 }
 
+function stripUrlMatch(match) {
+  const trailing = match.match(/[.,;:!?)]$/);
+  return trailing ? trailing[0] : '';
+}
+
 export function stripURLs(text) {
   if (!text) return '';
-  return text.replace(/https?:\/\/[^\s]+/g, '')
-    .replace(/www\.[^\s]+/g, '');
+  return text.replace(/https?:\/\/[^\s]+/g, stripUrlMatch)
+    .replace(/www\.[^\s]+/g, stripUrlMatch);
 }
 
 // ── Line Cleaners ──
@@ -220,7 +293,9 @@ export function fixPunctuationSpacing(text) {
   if (!text) return '';
   // Add space after punctuation when followed by a non-space, non-newline, non-digit character
   // But not when the punctuation is between digits (e.g. 1.5, 3,000)
-  return text.replace(/([.!?,;:])([^\s\d\n])/g, '$1 $2');
+  return text
+    .replace(/([.!?,;:])([^\s\d\n"'’”)\]\}])/g, '$1 $2')
+    .replace(/([.!?,;:][)"'’”\]\}])([^\s\d\n])/g, '$1 $2');
 }
 
 // ── Registry ──
