@@ -10,7 +10,7 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 
 **Phase:** V1.5 — feature expansion complete
 **Last Session:** 2026-04-07
-**Last Session Summary:** Completed optimization bundle Phase 2 on `fix/phase-1-cleaner-correctness` with stale-while-revalidate shell caching, an in-app update banner, and `keenbear-v7` service worker caches.
+**Last Session Summary:** Completed optimization bundle Phase 3 on `fix/phase-1-cleaner-correctness` by splitting `ui.js` into focused modules, improving invisibles/status performance, and bumping the service worker caches to `keenbear-v8`.
 
 ## What's Working
 - Product specification: `keenbear-spec.md`
@@ -19,15 +19,15 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 - Git initialized with remote `git@github.com:adamprime/keenbear.git`
 - **Deployed** to Netlify at keenbear.com
 - **Test harness:** `test/test-runner.html` (browser) + `test/run-node.js` (Node CLI) — 157 tests all green
-- **`js/history.js`:** Index-based undo/redo stack — 20-level depth, no-op dedupe (14 tests)
+- **Test harness:** `test/test-runner.html` (browser) + `test/run-node.js` (Node CLI) — 165 tests all green
 - **`js/cleaners.js`:** 25 cleaner functions with registry pattern, priority-ordered (122 tests)
 - **`js/find-replace.js`:** Pattern compilation, match counting, replace all with regex safety (21 tests)
 - **`js/ui.js`:** Full UI wiring — cleaners, toolbar, keyboard shortcuts (Alt+1-9 for cleaners, Alt+0 for invisibles), filter, find/replace panel, show invisibles, platform-aware shortcut badges
-- **`js/app.js`:** Entry point with service worker registration
+- **`js/ui/*`:** Split UI modules for DOM, flavors/theme, invisibles, keyboard, find, and composition-root wiring
 - **`index.html` + `style.css`:** Two-panel layout, 5 themes (dark/light each), responsive mobile bottom sheet, textarea constrained to 80ch, pinned status bar
 - **5 Theme Flavors:** Salty Octopus (default, pirate/nautical), Hazmat (brutalist), Artisanal (minimalist), Butler (formal), Y2K (retro)
 - **PWA:** manifest.json + service worker (v7 shell/image caches) for offline/installable support, in-app refresh banner, and stale-while-revalidate shell updates
-- **GEO/SEO:** JSON-LD (WebApplication + FAQPage), robots.txt, llms.txt, sitemap.xml, netlify.toml, OG + Twitter Card meta, canonical URL
+- **PWA:** manifest.json + service worker (v8 shell/image caches) for offline/installable support, in-app refresh banner, and stale-while-revalidate shell updates
 - **About section:** Inline About prose → Cleaner Reference (monospace before/after examples for all 25 cleaners) → FAQ — all flavor-aware styled, below the fold
 
 ### Cleaners (25 total, priority-ordered in sidebar)
@@ -60,14 +60,14 @@ V1 complete. Deployed to Netlify. Favicon done. Major feature expansion complete
 | Netlify Deploy | Complete | main | Live at keenbear.com |
 | Favicon | Complete | main | Done |
 | V1.5 Feature Expansion | Complete | main | 9 new cleaners, pirate theme, shortcuts, reference docs |
-| Optimization bundle Phases 1-2 | Complete on branch | fix/phase-1-cleaner-correctness | Cleaner correctness fixes plus SW stale-while-revalidate, update banner, offline reload verified |
+| Optimization bundle Phases 1-3 | Complete on branch | fix/phase-1-cleaner-correctness | Cleaner correctness, SW refresh flow, `ui.js` split, perf pass, 165 tests green |
 
 ## What's Next
 <!-- Prioritized backlog. Top item = next thing to work on. -->
 
-1. **Optimization bundle Phase 3** — `ui.js` split + invisibles/status perf work
-2. **My Scrub** — chained cleaner feature (v2 headline feature)
-3. **Mobile UX review** — verify shortcuts, reference section, pinned status bar on mobile
+1. **My Scrub** — chained cleaner feature (v2 headline feature)
+2. **Mobile UX review** — verify shortcuts, reference section, pinned status bar on mobile
+3. **Favicon extraction polish** — optional cleanup for app/install icon variants
 
 ## Open Decisions
 <!-- Architectural or product decisions that haven't been made yet. -->
@@ -111,6 +111,17 @@ Single-page, client-only app (no server, no accounts, no external dependencies).
 
 ## Session Log
 <!-- Brief log of recent sessions. Newest first. Delete entries older than 30 days. -->
+
+### 2026-04-07 (session 8)
+- **Goal:** Execute Phase 3 of the optimization bundle
+- **Accomplished:**
+  - Split `js/ui.js` into `js/ui/dom.js`, `flavors.js`, `theme.js`, `invisibles.js`, `find.js`, `keyboard.js`, and `index.js`
+  - Replaced per-character invisibles rendering with an idle-scheduled run-based renderer, added scroll-event sync, `contain: strict`, and a large-document safety cap
+  - Debounced large-input status updates, added a status-note slot, and preserved the documented paste mutation path during the split
+  - Added `ui-invisibles` and `ui-keyboard` tests, updated the browser test harness, and bumped the service worker caches to `keenbear-v8` for the new module asset list
+  - Verified keyboard shortcuts, invisibles toggling, browser test harness, cache contents, and offline reload with `agent-browser`
+- **Didn't finish:** No new product feature work beyond the optimization bundle
+- **Discovered:** Exporting factory functions from `keyboard.js` and `invisibles.js` keeps the new modules easy to test in Node without a DOM shim.
 
 ### 2026-04-07 (session 7)
 - **Goal:** Execute Phase 2 of the optimization bundle

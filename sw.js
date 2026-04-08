@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const SHELL_CACHE = `keenbear-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `keenbear-images-${CACHE_VERSION}`;
 const SHELL_ASSETS = [
@@ -6,7 +6,13 @@ const SHELL_ASSETS = [
   '/index.html',
   '/style.css',
   '/js/app.js',
-  '/js/ui.js',
+  '/js/ui/index.js',
+  '/js/ui/dom.js',
+  '/js/ui/theme.js',
+  '/js/ui/flavors.js',
+  '/js/ui/keyboard.js',
+  '/js/ui/invisibles.js',
+  '/js/ui/find.js',
   '/js/cleaners.js',
   '/js/history.js',
   '/js/find-replace.js',
