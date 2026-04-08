@@ -3,7 +3,7 @@ import {
   handleFilter,
   handlePasteEvent,
   handleRedo,
-  handleTextareaInput,
+  handleUndo,
   platform,
   refs,
   renderCleanerList,
