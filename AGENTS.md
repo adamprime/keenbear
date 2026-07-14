@@ -91,6 +91,6 @@ node test/run-node.js
 
 ## Known Limitations
 
-- Show Invisibles auto-disables on very large documents (~500KB) to avoid jank
+- Show Invisibles auto-disables on very large documents (>100,000 chars) to avoid jank
 - `textarea` native undo and custom history coexist via a `lastActionWasCleaner` flag — edge cases possible with rapid mixed input
 - IME composition events are guarded but not exhaustively tested across all input methods
