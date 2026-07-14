@@ -33,7 +33,7 @@
 
 ### `renderInvisiblesString`
 - `returns empty string for empty input`
-- `renders markers for spaces tabs and newlines`
+- `renders markers for spaces and newlines, passing tabs through unchanged`
 - `renders marker-only output for whitespace input`
 
 ### `createKeydownHandler`

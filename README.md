@@ -19,7 +19,7 @@ A free, zero-dependency text cleaning utility that runs entirely in your browser
 - **20-level undo/redo** — every cleaner application is one undo step
 - **Offline-capable** — PWA with service worker, installable on desktop and mobile
 - **No build step** — plain HTML, CSS, and vanilla JS ES modules
-- **143 tests** — full TDD coverage across cleaners, history, and find/replace
+- **165 tests** — full TDD coverage across cleaners, history, find/replace, and UI behavior
 
 ## Cleaners
 
@@ -74,16 +74,25 @@ keenbear/
 ├── sw.js                   # Service worker (cache-first)
 ├── js/
 │   ├── app.js              # Entry point + service worker registration
-│   ├── ui.js               # DOM wiring, keyboard shortcuts, theme system
 │   ├── cleaners.js         # 25 pure (text) => text functions + registry
 │   ├── history.js          # Index-based undo/redo stack (20 levels)
-│   └── find-replace.js     # Pattern compilation + regex safety
+│   ├── find-replace.js     # Pattern compilation + regex safety
+│   └── ui/
+│       ├── index.js        # UI composition root and event wiring
+│       ├── dom.js          # DOM refs, history-backed mutations, status bar
+│       ├── theme.js        # Theme and flavor switching
+│       ├── flavors.js      # Flavor copy/theme data
+│       ├── invisibles.js   # Show Invisibles overlay rendering + scroll sync
+│       ├── find.js         # Find & Replace panel wiring
+│       └── keyboard.js     # Keyboard shortcut handling
 ├── test/
-│   ├── run-node.js         # Node CLI test runner (143 tests)
+│   ├── run-node.js         # Node CLI test runner (165 tests)
 │   ├── test-runner.html    # Browser test harness
-│   ├── cleaners.test.js    # 108 cleaner tests
-│   ├── history.test.js     # 14 history tests
-│   └── find-replace.test.js # 21 find/replace tests
+│   ├── cleaners.test.js    # Cleaner tests
+│   ├── history.test.js     # Undo/redo tests
+│   ├── find-replace.test.js # Find/replace tests
+│   ├── ui-invisibles.test.js # Invisibles rendering tests
+│   └── ui-keyboard.test.js # Keyboard shortcut tests
 ├── docs/
 │   ├── STATUS.md           # Project state (read this first)
 │   ├── plans/              # Implementation plans
@@ -104,7 +113,7 @@ Zero dependencies. Each module has a single responsibility:
 - **`cleaners.js`** — pure `(text, options?) => text` functions. Adding a cleaner = write the function, add one registry entry, write tests. The UI picks it up automatically.
 - **`history.js`** — index-based undo/redo stack. Knows nothing about DOM or cleaners.
 - **`find-replace.js`** — pattern compilation with regex safety (500-char cap, invalid pattern handling).
-- **`ui.js`** — all DOM interaction. Routes every text mutation through `applyTextChange()` for consistent history tracking.
+- **`ui/`** — all DOM interaction, split by concern (composition root, DOM helpers, theme, invisibles, find, keyboard). Every text mutation routes through `applyTextChange()` in `ui/dom.js` for consistent history tracking.
 - **`app.js`** — thin orchestration: imports ui, calls `init()`, registers service worker.
 
 ### Adding a New Cleaner
