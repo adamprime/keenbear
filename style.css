@@ -544,7 +544,8 @@ body.flavor-y2k .btn.active {
   resize: none;
   outline: none;
   tab-size: 2;
-  overflow: auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
   max-width: 80ch;
 }
 
@@ -582,7 +583,8 @@ body.flavor-y2k.show-invisibles .text-area {
   padding: 16px;
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow: hidden;
+  overflow-y: scroll;
+  overflow-x: hidden;
   color: var(--fg);
   tab-size: 2;
   max-width: 80ch;
@@ -598,7 +600,15 @@ body.show-invisibles .invisibles-overlay {
 }
 
 .inv-tab {
+  position: relative;
   color: var(--fg-dim);
+}
+
+.inv-tab::before {
+  content: '\2192';
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .inv-newline {
@@ -638,6 +648,22 @@ body.flavor-y2k .text-area::-webkit-scrollbar-thumb {
   border: 2px outset #fff;
   border-right-color: #808080;
   border-bottom-color: #808080;
+}
+
+/* Overlay reserves an identically sized gutter so wrap widths match the
+   textarea, but keeps the scrollbar itself invisible. */
+.invisibles-overlay::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+}
+
+.invisibles-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.invisibles-overlay::-webkit-scrollbar-thumb {
+  background: transparent;
+  border: none;
 }
 
 /* ── Sidebar ── */
@@ -1098,8 +1124,47 @@ body.flavor-y2k .faq-item p { color: #000; }
 /* ── Responsive: mobile ── */
 
 @media (max-width: 768px) {
-  .header-tagline, .flavor-select {
+  .header-tagline {
     display: none;
+  }
+
+  .header {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .header-brand {
+    min-width: 0;
+    flex-shrink: 1;
+    gap: 6px;
+  }
+
+  .header-mascot {
+    width: 26px;
+    height: 26px;
+  }
+
+  .header-title {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-controls {
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .flavor-select {
+    display: block;
+    max-width: 108px;
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    min-height: 44px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .sidebar {

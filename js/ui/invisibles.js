@@ -1,18 +1,17 @@
 const scheduleIdle = globalThis.requestIdleCallback
-  ? globalThis.requestIdleCallback.bind(globalThis)
+  ? (callback) => globalThis.requestIdleCallback(callback, { timeout: 200 })
   : (callback) => setTimeout(() => callback({ didTimeout: false, timeRemaining: () => 0 }), 0);
 
 const cancelIdle = globalThis.cancelIdleCallback
   ? globalThis.cancelIdleCallback.bind(globalThis)
   : globalThis.clearTimeout.bind(globalThis);
 
-export const MAX_INVISIBLES_LENGTH = 500_000;
+export const MAX_INVISIBLES_LENGTH = 100_000;
 
 export function renderInvisiblesString(text) {
   if (!text) return '';
   return text
     .replace(/ /g, '\u00B7')
-    .replace(/\t/g, '\u2192\t')
     .replace(/\n/g, '\u00B6\n');
 }
 
@@ -34,7 +33,7 @@ export function createInvisiblesController({
   const documentRef = overlay.ownerDocument;
   const templates = {
     space: createMarkerTemplate(documentRef, 'inv-space', '\u00B7'),
-    tab: createMarkerTemplate(documentRef, 'inv-tab', '\u2192\t'),
+    tab: createMarkerTemplate(documentRef, 'inv-tab', '\t'),
     newline: createMarkerTemplate(documentRef, 'inv-newline', '\u00B6'),
   };
 

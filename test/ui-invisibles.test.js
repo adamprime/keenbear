@@ -5,11 +5,11 @@ describe('renderInvisiblesString', () => {
     assert.equal(renderInvisiblesString(''), '');
   });
 
-  it('renders markers for spaces tabs and newlines', () => {
-    assert.equal(renderInvisiblesString('a b\tc\n'), 'a·b→\tc¶\n');
+  it('renders markers for spaces and newlines, passing tabs through unchanged', () => {
+    assert.equal(renderInvisiblesString('a b\tc\n'), 'a·b\tc¶\n');
   });
 
   it('renders marker-only output for whitespace input', () => {
-    assert.equal(renderInvisiblesString(' \t\n'), '·→\t¶\n');
+    assert.equal(renderInvisiblesString(' \t\n'), '·\t¶\n');
   });
 });
