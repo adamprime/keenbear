@@ -42,3 +42,13 @@
 - `ignores composed Alt characters when the physical key is not a digit`
 - `opens the find panel for Cmd+F`
 - `closes the find panel on Escape when open`
+
+## Remove Line Numbers coverage
+
+### `removeLineNumbers`
+- grep (`1:`), pipe (`1 |`), and cat -n (tab) prefix styles strip cleanly
+- indentation after the separator survives (only one space consumed)
+- all-or-nothing: mixed content and leading-number prose are left unchanged
+- bare-number lines become empty lines; blank lines pass through
+- ordered lists strip (documented user-invoked behavior)
+- CRLF: bare-number lines keep their `\r` so line endings stay consistent

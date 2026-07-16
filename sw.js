@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v9';
+const CACHE_VERSION = 'v10';
 const SHELL_CACHE = `keenbear-shell-${CACHE_VERSION}`;
 const IMAGE_CACHE = `keenbear-images-${CACHE_VERSION}`;
 const SHELL_ASSETS = [

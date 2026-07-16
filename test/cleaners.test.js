@@ -24,6 +24,7 @@ import {
   stripURLs,
   removeBlankLines,
   fixPunctuationSpacing,
+  removeLineNumbers,
 } from '../js/cleaners.js';
 
 // ── removeExtraSpaces ──
@@ -628,5 +629,53 @@ describe('fixPunctuationSpacing', () => {
 
   it('handles empty string', () => {
     assert.equal(fixPunctuationSpacing(''), '');
+  });
+});
+
+// ── removeLineNumbers ──
+
+describe('removeLineNumbers', () => {
+  it('handles grep style', () => {
+    assert.equal(removeLineNumbers('1: foo\n2: bar'), 'foo\nbar');
+  });
+
+  it('handles pipe style', () => {
+    assert.equal(removeLineNumbers(' 1 | foo\n 2 | bar'), 'foo\nbar');
+  });
+
+  it('handles cat -n tab style', () => {
+    assert.equal(removeLineNumbers('     1\tfoo\n     2\tbar'), 'foo\nbar');
+  });
+
+  it('preserves indentation after separator', () => {
+    assert.equal(removeLineNumbers('1:     indented'), '    indented');
+  });
+
+  it('leaves mixed content unchanged', () => {
+    assert.equal(removeLineNumbers('foo\n2: bar'), 'foo\n2: bar');
+  });
+
+  it('leaves leading-number prose unchanged', () => {
+    assert.equal(removeLineNumbers('2026 was a big year'), '2026 was a big year');
+  });
+
+  it('converts bare number lines to empty', () => {
+    assert.equal(removeLineNumbers('1: a\n2\n3: b'), 'a\n\nb');
+  });
+
+  it('passes through blank lines', () => {
+    assert.equal(removeLineNumbers('1: a\n\n2: b'), 'a\n\nb');
+  });
+
+  it('strips ordered list style', () => {
+    assert.equal(removeLineNumbers('1. buy milk\n2. eat'), 'buy milk\neat');
+  });
+
+  it('preserves CRLF line endings on bare number lines', () => {
+    assert.equal(removeLineNumbers('1: a\r\n2\r\n3: b'), 'a\r\n\r\nb');
+  });
+
+  it('handles empty string', () => {
+    assert.equal(removeLineNumbers(''), '');
   });
 });

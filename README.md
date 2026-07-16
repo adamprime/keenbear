@@ -10,7 +10,7 @@ A free, zero-dependency text cleaning utility that runs entirely in your browser
 
 ## Features
 
-- **25 one-click cleaners** — whitespace, case transforms, unicode normalization, quote handling, emoji stripping, email/URL redaction, and more
+- **26 one-click cleaners** — whitespace, case transforms, unicode normalization, quote handling, emoji stripping, email/URL redaction, and more
 - **Clean Code Paste** — one-click combo that strips indentation, unwraps hard-wrapped paragraphs, and collapses extra spaces (built for cleaning AI assistant output)
 - **Find & Replace** — literal and regex modes with real-time match count
 - **Show Invisibles** — toggle visibility of spaces (·), tabs (→), and newlines (¶)
@@ -30,7 +30,7 @@ A free, zero-dependency text cleaning utility that runs entirely in your browser
 | **Quotes & Characters** | Straighten Quotes, Smarten Quotes, Strip Emojis, Remove Non-ASCII |
 | **Case Transforms** | UPPERCASE, lowercase, Title Case, Sentence Case |
 | **Privacy** | Strip Emails, Strip URLs |
-| **Lines** | Sort Lines, Remove Duplicate Lines, Extract from HTML |
+| **Lines** | Sort Lines, Remove Duplicate Lines, Remove Line Numbers, Extract from HTML |
 | **Writing** | Fix Punctuation Spacing |
 
 ## Keyboard Shortcuts
@@ -74,7 +74,7 @@ keenbear/
 ├── sw.js                   # Service worker (cache-first)
 ├── js/
 │   ├── app.js              # Entry point + service worker registration
-│   ├── cleaners.js         # 25 pure (text) => text functions + registry
+│   ├── cleaners.js         # 26 pure (text) => text functions + registry
 │   ├── history.js          # Index-based undo/redo stack (20 levels)
 │   ├── find-replace.js     # Pattern compilation + regex safety
 │   └── ui/
