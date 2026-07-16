@@ -76,6 +76,41 @@ export function removeForwardingCharacters(text) {
   return text.split('\n').map(line => line.replace(/^>\s?/, '')).join('\n');
 }
 
+export function removeLineNumbers(text) {
+  if (!text) return '';
+
+  const lines = text.split('\n');
+  let allNumbered = true;
+  const cleanedLines = lines.map(line => {
+    if (/^\s*$/.test(line)) {
+      return line; // blank line unchanged
+    }
+
+    // Check if it's a bare-number line (preserve a trailing \r so CRLF text stays consistent)
+    if (/^\s*\d+\s*$/.test(line)) {
+      return line.endsWith('\r') ? '\r' : '';
+    }
+
+    // Check if it's a numbered content line
+    const match = line.match(/^\s*(\d+)(\s*[:|.)]\s?|\t)/);
+    if (match) {
+      const prefixLength = match[0].length;
+      return line.slice(prefixLength);
+    }
+
+    // Not a numbered line
+    allNumbered = false;
+    return line;
+  });
+
+  // If any line was unnumbered, return original text
+  if (!allNumbered) {
+    return text;
+  }
+
+  return cleanedLines.join('\n');
+}
+
 export function toUpperCase(text) {
   return text.toUpperCase();
 }
@@ -314,6 +349,7 @@ export const cleaners = [
   { id: 'remove-all-tabs', name: 'Remove All Tabs', fn: removeAllTabs, category: 'whitespace' },
   { id: 'rewrap-text', name: 'Rewrap Text', fn: rewrapText, category: 'whitespace' },
   { id: 'remove-forwarding-chars', name: 'Remove Forwarding Characters', fn: removeForwardingCharacters, category: 'whitespace' },
+  { id: 'remove-line-numbers', name: 'Remove Line Numbers', fn: removeLineNumbers, category: 'lines' },
   // Quotes & characters
   { id: 'straighten-quotes', name: 'Straighten Quotes', fn: straightenQuotes, category: 'quotes' },
   { id: 'smarten-quotes', name: 'Smarten Quotes', fn: smartenQuotes, category: 'quotes' },

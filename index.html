@@ -78,7 +78,7 @@
         "name": "What text cleaners are available?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Keen Bear includes 25 one-click cleaners organized by category. Whitespace cleaners handle extra spaces, extra returns, leading indentation, tabs, line trimming, unwrapping paragraphs, cleaning code pastes, and removing blank lines. Character cleaners strip emojis, remove non-ASCII characters, and normalize unicode. Text transforms cover uppercase, lowercase, title case, sentence case, and HTML extraction. Privacy cleaners strip emails and URLs. Quote cleaners straighten or smarten curly quotes. Line operations sort and deduplicate. Writing tools fix punctuation spacing. Plus Find & Replace with regex support."
+          "text": "Keen Bear includes 26 one-click cleaners organized by category. Whitespace cleaners handle extra spaces, extra returns, leading indentation, tabs, line trimming, unwrapping paragraphs, cleaning code pastes, and removing blank lines. Character cleaners strip emojis, remove non-ASCII characters, and normalize unicode. Text transforms cover uppercase, lowercase, title case, sentence case, and HTML extraction. Privacy cleaners strip emails and URLs. Quote cleaners straighten or smarten curly quotes. Line operations sort, deduplicate, and remove line numbers. Writing tools fix punctuation spacing. Plus Find & Replace with regex support."
         }
       },
       {
@@ -217,7 +217,7 @@
       <p>Keen Bear is a Progressive Web App. After your first visit, it works fully offline and can be installed as a standalone app on your desktop or phone. It's part of a collection of small, useful web tools built by <a href="https://adamtervort.com" target="_blank" rel="noopener">Adam Tervort</a>.</p>
 
       <h2 class="about-heading">Cleaner Reference</h2>
-      <p>Keen Bear includes 25 one-click cleaners organized by category. Click any cleaner in the sidebar to apply it to your entire text. Each application is one undo step.</p>
+      <p>Keen Bear includes 26 one-click cleaners organized by category. Click any cleaner in the sidebar to apply it to your entire text. Each application is one undo step.</p>
 
       <h3 class="ref-category">Whitespace</h3>
 
@@ -421,6 +421,15 @@ After:   apple
 After:   apple
          banana
          cherry</code></pre>
+      </div>
+
+      <div class="ref-item">
+        <h4>Remove Line Numbers</h4>
+        <p>Strips leading line numbers (grep, cat -n, and editor styles) from pasted code. Only applies when every non-blank line is numbered, so mixed text is left alone.</p>
+        <pre class="ref-example"><code>Before:  1: const a = 1;
+         2: const b = 2;
+After:   const a = 1;
+         const b = 2;</code></pre>
       </div>
 
       <h3 class="ref-category">Writing</h3>
